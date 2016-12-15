@@ -1,0 +1,31 @@
+{
+  "name": "schwifty-migration",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "lab -a code -t 100 -L"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BigRoomStudios/schwifty-migration.git"
+  },
+  "keywords": [
+    "hapi",
+    "plugin",
+    "objection",
+    "database",
+    "orm"
+  ],
+  "author": "William Woodruff <bill@bigroomstudios.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BigRoomStudios/schwifty-migration/issues"
+  },
+  "homepage": "https://github.com/BigRoomStudios/schwifty-migration#readme",
+  "dependencies": {
+    "items": "^2.1.1",
+    "js-beautify": "^1.6.4",
+    "jsondiffpatch": "^0.2.4"
+  }
+}
