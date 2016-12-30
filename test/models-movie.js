@@ -1,7 +1,7 @@
 'use strict';
 
 const Joi = require('joi');
-const Model = require('..').Model;
+const Model = require('schwifty').Model;
 
 module.exports = [
 

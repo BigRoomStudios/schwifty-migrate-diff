@@ -4,7 +4,7 @@
   "description": "A hapi plugin to aid migration for schwifty models",
   "main": "lib/index.js",
   "scripts": {
-    "test": "lab -a code -t 100 -L",
+    "test": "lab -a code -t 100 -L -I '__core-js_shared__'",
     "coveralls": "lab -r lcov | coveralls"
   },
   "repository": {
@@ -33,7 +33,8 @@
     "inquirer": "^2.0.0",
     "items": "^2.1.1",
     "js-beautify": "^1.6.4",
-    "jsondiffpatch": "^0.2.4"
+    "jsondiffpatch": "^0.2.4",
+    "knex": "^0.12.6"
   },
   "peerDependencies": {
     "hapi": ">=10 <17"
@@ -41,6 +42,8 @@
   "devDependencies": {
     "code": "4.x.x",
     "coveralls": "^2.11.15",
+    "eslint": "^3.12.2",
+    "glue": "^4.1.0",
     "hapi": "^16.1.0",
     "lab": "11.x.x",
     "sqlite3": "^3.1.8"

@@ -26,8 +26,8 @@ describe('SchwiftyMigration', () => {
 
     const setup = () => {
 
-        if (Fs.existsSync(migrationsDir)) {
-            Fs.rmdirSync(migrationsDir);
+        if (Fs.existsSync('./migrations')) {
+            Fs.rmdirSync('./migrations');
         }
     };
 
@@ -35,14 +35,13 @@ describe('SchwiftyMigration', () => {
 
     };
 
-
-    const getSchwiftyOptions = (fileDbName) => {
+    const getSchwiftyOptions = (includeModels, fileDbName) => {
 
         if (fileDbName) {
             fileDbName = Path.normalize('./test/' + fileDbName);
         }
 
-        return JSON.parse(JSON.stringify({
+        const options = JSON.parse(JSON.stringify({
 
             knexConfig: {
                 client: 'sqlite3',
@@ -52,25 +51,20 @@ describe('SchwiftyMigration', () => {
                 useNullAsDefault: true
             }
         }));
-    };
-
-    const getSchwiftyMigrationOptions = () => {
-
-        return {
-            dir: Path.normalize(`${__dirname}/../lib`),
-            mode: 'create'
-        }
-    };
-
-    const getOptions = (includeModels, fileDbName) => {
-
-        const options = schwiftyOptions();
 
         if (includeModels) {
             options.models = ModelsFixture;
         }
 
         return options;
+    };
+
+    const getSchwiftyMigrationOptions = (mode) => {
+
+        return {
+            dir: __dirname,
+            mode: mode ? mode : 'create'
+        }
     };
 
     const getServer = (pluginOptions, cb) => {
@@ -118,6 +112,7 @@ describe('SchwiftyMigration', () => {
 
             // DRY so I don't have to keep checking for this error
             Hoek.assert(!err, err);
+            console.log('//////////');
             cb(err, server);
         });
     };
@@ -131,14 +126,23 @@ describe('SchwiftyMigration', () => {
     // Run setup before tests
     setup();
 
-    it('throws on invalid plugin options passed', (done) => {
 
-        getServer((err, server) => {
+    // it('throws on invalid plugin options passed', (done) => {
 
-            expect(err).not.to.exist();
-            done();
-        });
-    });
+    //     const schwiftyMigrationOptions = getSchwiftyMigrationOptions();
+
+    //     schwiftyMigrationOptions.illegalProp = 'Im here';
+
+    //     expect(() => {
+
+    //         getServer({ schwiftyMigrationOptions }, (_, server) => {
+
+    //             throw new Error('Should not make it here');
+    //         });
+    //     }).to.throw(/Bad plugin options passed to schwifty-migration/);
+
+    //     done();
+    // });
 
     it('creates a migration directory if none exists', (done) => {
 
