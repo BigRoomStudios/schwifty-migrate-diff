@@ -6,7 +6,13 @@ const Lab = require('lab');
 const Code = require('code');
 const Hapi = require('hapi');
 const Path = require('path');
+const Fs = require('fs');
+const Knex = require('knex');
+const Items = require('items');
+const Hoek = require('hoek');
+const ModelsFixture = require('./models');
 const SchwiftyMigration = require('..');
+const Glue = require('glue');
 
 
 // Test shortcuts
@@ -18,26 +24,136 @@ const it = lab.it;
 
 describe('SchwiftyMigration', () => {
 
-    const getServer = (options, cb) => {
+    const setup = () => {
 
-        const server = new Hapi.Server();
-        server.connection();
+        if (Fs.existsSync(migrationsDir)) {
+            Fs.rmdirSync(migrationsDir);
+        }
+    };
 
-        server.register({
-            register: Schwifty,
-            options
-        }, (err) => {
+    const teardown = () => {
 
-            if (err) {
-                return cb(err);
+    };
+
+
+    const getSchwiftyOptions = (fileDbName) => {
+
+        if (fileDbName) {
+            fileDbName = Path.normalize('./test/' + fileDbName);
+        }
+
+        return JSON.parse(JSON.stringify({
+
+            knexConfig: {
+                client: 'sqlite3',
+                connection: {
+                    filename: fileDbName ? fileDbName : ':memory:'
+                },
+                useNullAsDefault: true
             }
+        }));
+    };
 
-            return cb(null, server);
+    const getSchwiftyMigrationOptions = () => {
+
+        return {
+            dir: Path.normalize(`${__dirname}/../lib`),
+            mode: 'create'
+        }
+    };
+
+    const getOptions = (includeModels, fileDbName) => {
+
+        const options = schwiftyOptions();
+
+        if (includeModels) {
+            options.models = ModelsFixture;
+        }
+
+        return options;
+    };
+
+    const getServer = (pluginOptions, cb) => {
+
+        if (typeof pluginOptions === 'function') {
+            cb = pluginOptions;
+            pluginOptions = {
+                schwiftyOptions: getSchwiftyOptions(),
+                schwiftyMigrationOptions: getSchwiftyMigrationOptions()
+            }
+        }
+
+        if (!pluginOptions.schwiftyOptions) {
+            pluginOptions.schwiftyOptions = getSchwiftyOptions();
+        }
+
+        if (!pluginOptions.schwiftyMigrationOptions) {
+            pluginOptions.schwiftyMigrationOptions = getSchwiftyMigrationOptions();
+        }
+
+        Glue.compose({
+            connections: [
+                {
+                    host: '0.0.0.0',
+                    port: process.env.PORT || 3000,
+                    labels: 'test'
+                }
+            ],
+            registrations: [
+                {
+                    plugin: {
+                        register: 'schwifty',
+                        options: pluginOptions.schwiftyOptions
+                    }
+                },
+                {
+                    plugin: {
+                        register: '..',
+                        options: pluginOptions.schwiftyMigrationOptions
+                    }
+                },
+            ]
+        }, { relativeTo: __dirname },
+        (err, server) => {
+
+            // DRY so I don't have to keep checking for this error
+            Hoek.assert(!err, err);
+            cb(err, server);
         });
     };
 
 
+    const state = (server) => {
+
+        return server.realm.plugins.schwiftyMigration;
+    };
+
+    // Run setup before tests
+    setup();
+
+    it('throws on invalid plugin options passed', (done) => {
+
+        getServer((err, server) => {
+
+            expect(err).not.to.exist();
+            done();
+        });
+    });
+
+    it('creates a migration directory if none exists', (done) => {
+
+        getServer((err, server) => {
+
+            expect(err).not.to.exist();
+            done();
+        });
+    });
+
+
+
+    teardown();
 });
+
 
 
 

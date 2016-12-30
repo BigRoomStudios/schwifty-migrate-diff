@@ -1,20 +1,25 @@
 {
   "name": "schwifty-migration",
   "version": "0.0.1",
-  "description": "",
+  "description": "A hapi plugin to aid migration for schwifty models",
   "main": "lib/index.js",
   "scripts": {
-    "test": "lab -a code -t 100 -L"
+    "test": "lab -a code -t 100 -L",
+    "coveralls": "lab -r lcov | coveralls"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BigRoomStudios/schwifty-migration.git"
+  },
+  "engines": {
+    "node": ">=4.0.0"
   },
   "keywords": [
     "hapi",
     "plugin",
     "objection",
     "database",
+    "migration",
     "orm"
   ],
   "author": "William Woodruff <bill@bigroomstudios.com>",
@@ -29,5 +34,15 @@
     "items": "^2.1.1",
     "js-beautify": "^1.6.4",
     "jsondiffpatch": "^0.2.4"
+  },
+  "peerDependencies": {
+    "hapi": ">=10 <17"
+  },
+  "devDependencies": {
+    "code": "4.x.x",
+    "coveralls": "^2.11.15",
+    "hapi": "^16.1.0",
+    "lab": "11.x.x",
+    "sqlite3": "^3.1.8"
   }
 }
