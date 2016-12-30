@@ -4,14 +4,12 @@
 
 const Lab = require('lab');
 const Code = require('code');
-const Hapi = require('hapi');
 const Path = require('path');
 const Fs = require('fs');
 const Knex = require('knex');
 const Items = require('items');
 const Hoek = require('hoek');
 const ModelsFixture = require('./models');
-const SchwiftyMigration = require('..');
 const Glue = require('glue');
 
 
@@ -64,7 +62,7 @@ describe('SchwiftyMigration', () => {
         return {
             dir: __dirname,
             mode: mode ? mode : 'create'
-        }
+        };
     };
 
     const getServer = (pluginOptions, cb) => {
@@ -74,7 +72,7 @@ describe('SchwiftyMigration', () => {
             pluginOptions = {
                 schwiftyOptions: getSchwiftyOptions(),
                 schwiftyMigrationOptions: getSchwiftyMigrationOptions()
-            }
+            };
         }
 
         if (!pluginOptions.schwiftyOptions) {
@@ -105,7 +103,7 @@ describe('SchwiftyMigration', () => {
                         register: '..',
                         options: pluginOptions.schwiftyMigrationOptions
                     }
-                },
+                }
             ]
         }, { relativeTo: __dirname },
         (err, server) => {
