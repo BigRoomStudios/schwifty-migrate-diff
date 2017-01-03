@@ -166,7 +166,7 @@ describe('SchwiftyMigration', () => {
 
     const state = (server) => {
 
-        return server.realm.plugins.schwiftyMigration;
+        return server.realm.plugins.schwifty;
     };
 
     // Run setup before tests
@@ -272,8 +272,9 @@ describe('SchwiftyMigration', () => {
 
                     expect(err).to.not.exist();
 
-                    expect(state(server).dbTableSchemas).to.exist();
-                    console.log(state(server.root));
+                    // console.log(state(server.root));
+                    expect(state(server.root).dbTableSchemas).to.exist();
+
                     done();
                 });
             });
