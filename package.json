@@ -30,6 +30,7 @@
   "homepage": "https://github.com/BigRoomStudios/schwifty-migration#readme",
   "dependencies": {
     "chalk": "^1.1.3",
+    "handlebars": "^4.0.8",
     "inquirer": "^2.0.0",
     "items": "^2.1.1",
     "js-beautify": "^1.6.4",
