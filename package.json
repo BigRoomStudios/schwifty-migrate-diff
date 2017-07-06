@@ -35,7 +35,7 @@
     "items": "^2.1.1",
     "js-beautify": "^1.6.4",
     "jsondiffpatch": "^0.2.4",
-    "knex": "^0.12.6"
+    "knex": "^0.13.0"
   },
   "peerDependencies": {
     "hapi": ">=10 <17"

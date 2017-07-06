@@ -1,4 +1,18 @@
+'use strict';
 
-<h1>Hello!!</h1>
+const Async = require('async');
 
-{{#each}}
+exports.up = function (knex, Promise) {
+
+    // Table create
+
+    {{#each migrations.tableDeltas}}
+        {{#each tableDelta.create}}
+            knex.schema.createTableIfNotExists({{this}})
+        {{/each}}
+    {{/each}}
+};
+
+exports.down = function (knex, Promise) {
+
+};
