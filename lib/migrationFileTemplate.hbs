@@ -1,6 +1,6 @@
 'use strict';
 
-const Async = require('async');
+const Items = require('items');
 
 exports.up = function (knex, Promise) {
 
@@ -8,7 +8,55 @@ exports.up = function (knex, Promise) {
 
     {{#each migrations.tableDeltas}}
         {{#each tableDelta.create}}
-            knex.schema.createTableIfNotExists({{this}})
+
+            {{#if (keyInObject this @root.allTables)}}
+    knex.schema.createTableIfNotExists('{{this}}', function(table) {
+
+                {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
+        table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
+                {{/each}}
+    });
+            {{else}}
+    knex.schema.createTableIfNotExists('{{this}}');
+            {{/if}}
+
+        {{/each}}
+
+    // Table delete not yet supported
+        {{#each tableDelta.drop}}
+    knex.schema.dropTable('{{this}}');
+        {{/each}}
+    // Table nameChange not yet supported
+        {{#each tableDelta.alter}}
+    knex.schema.renameTable('{{this}}')
+        {{/each}}
+    {{/each}}
+
+    // Join table create
+
+    {{#each migrations.tableDeltas}}
+        {{#each tableDelta.create}}
+
+            {{#if (keyInObject this @root.allTables)}}
+    knex.schema.createTableIfNotExists('{{this}}', function(table) {
+
+                {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
+        table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
+                {{/each}}
+    });
+            {{else}}
+    knex.schema.createTableIfNotExists('{{this}}');
+            {{/if}}
+
+        {{/each}}
+
+    // Table delete not yet supported
+        {{#each tableDelta.drop}}
+    knex.schema.dropTable('{{this}}');
+        {{/each}}
+    // Table nameChange not yet supported
+        {{#each tableDelta.alter}}
+    knex.schema.renameTable('{{this}}')
         {{/each}}
     {{/each}}
 };
