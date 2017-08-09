@@ -1,0 +1,29 @@
+'use strict';
+
+const Items = require('items');
+
+exports.up = function (knex, Promise) {
+
+    // Table create
+
+    return Promise.all([
+
+    {{> build-table-create-list tableDeltas=migrations.tableDeltas}}
+
+    ])
+    .then(function() {
+
+        // Join table create
+
+        Promise.all([
+        {{> build-table-create-list tables=migrations.tableDeltas}}
+        ]);
+    })
+};
+
+exports.down = function (knex, Promise) {
+
+};
+
+
+{{> build-column-modify-list columnDeltas=migrations.columnDeltas}}
