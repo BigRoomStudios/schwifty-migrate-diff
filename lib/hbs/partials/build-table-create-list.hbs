@@ -1,22 +1,16 @@
-
-{{!--
-    Note: these are intented all wonky because they need to look like that
-    for correct spacing for rendering
---}}
-
 {{#each tableDeltas}}
-    {{#each tableDelta.create}}
+    {{#each (keyFromObject 'create' (keyFromObject ../tableType this))}}
 
-        {{#if (keyInObject this @root.allTables)}}
-        knex.schema.createTableIfNotExists('{{this}}', function(table) {
+    {{#if (keyInObject this @root.allTables)}}
+    knex.schema.createTableIfNotExists('{{this}}', function(table) {
 
-            {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
-            table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
-            {{/each}}
-        }),
-        {{else}}
-        knex.schema.createTableIfNotExists('{{this}}'),
-        {{/if}}
+        {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
+        table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
+        {{/each}}
+    }),
+    {{else}}
+    knex.schema.createTableIfNotExists('{{this}}'),
+    {{/if}}
 
     {{/each}}
 

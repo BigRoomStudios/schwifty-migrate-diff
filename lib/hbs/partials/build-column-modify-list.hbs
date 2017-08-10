@@ -1,44 +1,19 @@
-
-{{!--
-    Note: these are indented all wonky because they need to look like that
-    for correct spacing for rendering
---}}
-
+    // Handle column changes
 {{#each columnDeltas}}
-    {{#each changes}}
+{{#each changes}}
+    {{#if (itemNotInArray this.model @root.createdTables)}}
+    knex.schema.alterTable('{{this.model}}', function(table) {
 
-        Hello!
-        {{#if (itemNotInArray this.model createdTables)}}
-        Hello {{this}} is not in createdTables
-        {{/if}}
-    {{/each}}
+        {{#each this.create}}
+        table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this.model @root.allTables))}}('{{this}}');
+        {{/each}}
+        {{#each (objectKeys this.alter)}}
+        table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this.model @root.allTables))}}('{{this}}').alter();
+        {{/each}}
+        {{#each this.drop}}
+        table.dropColumn('{{this}}')
+        {{/each}}
+    }),
+    {{/if}}
 {{/each}}
-
-{{!--
-{{#each columns}}
-    {{#each tableDelta.create}}
-
-        {{#if (keyInObject this @root.allTables)}}
-        knex.schema.createTableIfNotExists('{{this}}', function(table) {
-
-            {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
-            table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
-            {{/each}}
-        }),
-        {{else}}
-        knex.schema.createTableIfNotExists('{{this}}'),
-        {{/if}}
-
-    {{/each}}
-
-    // Table delete not yet supported
-    {{#each tableDelta.drop}}
-    knex.schema.dropTable('{{this}}'),
-    {{/each}}
-
-    // Table nameChange not yet supported
-    {{#each tableDelta.alter}}
-    knex.schema.renameTable('{{this}}').
-    {{/each}}
 {{/each}}
---}}
