@@ -1,4 +1,4 @@
-    // Handle column changes
+    // Handle column unchanges
 {{#each columnDeltas}}
 {{#each changes}}
     {{#if (itemNotInArray this.model @root.createdTables)}}
@@ -8,10 +8,10 @@
         table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this.model @root.allTables))}}('{{this}}');
         {{/each}}
         {{#each (objectKeys this.alter)}}
-        table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this.model @root.allTables))}}('{{this}}').alter();
+        table.{{indexFromArray 1 (keyFromObject this ../this.alter)}}('{{this}}').alter();
         {{/each}}
         {{#each this.drop}}
-        table.dropColumn('{{this}}')
+        table.dropColumn('{{this.columnName}}')
         {{/each}}
     }),
     {{/if}}

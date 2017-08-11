@@ -9,20 +9,16 @@ exports.up = function (knex, Promise) {
     return Promise.all([
 
     {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='tableDelta'}}
+    {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='joinTableDelta'}}
 
     {{> build-column-modify-list columnDeltas=migrations.columnDeltas}}
 
     ])
-    .then(function() {
-
-        // Join table create
-
-        Promise.all([
-        {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='joinTableDelta'}}
-        ]);
-    })
 };
 
 exports.down = function (knex, Promise) {
 
+    {{> build-table-drop-list tableDeltas=migrations.tableDeltas}}
+
+    {{> build-column-unmodify-list columnDeltas=migrations.columnDeltas}}
 };

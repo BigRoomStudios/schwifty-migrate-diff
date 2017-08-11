@@ -1,16 +1,12 @@
 {{#each tableDeltas}}
     {{#each (keyFromObject 'create' (keyFromObject ../tableType this))}}
 
-    {{#if (keyInObject this @root.allTables)}}
     knex.schema.createTableIfNotExists('{{this}}', function(table) {
 
         {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
         table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
         {{/each}}
     }),
-    {{else}}
-    knex.schema.createTableIfNotExists('{{this}}'),
-    {{/if}}
 
     {{/each}}
 
