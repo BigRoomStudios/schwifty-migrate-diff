@@ -1,14 +1,13 @@
 'use strict';
 
-const Items = require('items');
-
 exports.up = function (knex, Promise) {
-
-    // Table create
 
     return Promise.all([
 
+        // Table Create
     {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='tableDelta'}}
+
+        // Join Table Create
     {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='joinTableDelta'}}
 
     {{> build-column-modify-list columnDeltas=migrations.columnDeltas}}
@@ -18,7 +17,10 @@ exports.up = function (knex, Promise) {
 
 exports.down = function (knex, Promise) {
 
+    return Promise.all([
+
     {{> build-table-drop-list tableDeltas=migrations.tableDeltas}}
 
     {{> build-column-unmodify-list columnDeltas=migrations.columnDeltas}}
+    ])
 };
