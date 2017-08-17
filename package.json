@@ -33,7 +33,6 @@
     "handlebars": "^4.0.8",
     "inquirer": "^2.0.0",
     "items": "^2.1.1",
-    "js-beautify": "^1.6.4",
     "jsondiffpatch": "^0.2.4",
     "knex": "^0.13.0"
   },
