@@ -11,7 +11,7 @@ npm install git+https://github.com/BigRoomStudios/schwifty.git#add-schwifty-migr
 npm install git+https://github.com/BigRoomStudios/schwifty-migration.git
 ```
 
-- Goto where `schwifty` gets registered on your server (Most likely in server/config.js), and add the `makeMigrationMode` plugin option.
+- Goto where `schwifty` gets registered on your server (Most likely in server/manifest.js), and add the `makeMigrationMode` plugin option.
 Set it to something like `makeMigrationMode: process.env.MIGRATE === 'true'`
 
 - Run your server start script so that schwifty's `makeMigrationMode` plugin option is set to true.
