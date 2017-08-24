@@ -18,7 +18,7 @@ Set it to something like `makeMigrationMode: process.env.MIGRATE_MAKE === 'true'
 
 Ex.
 ```
-MIGRATION=true npm start
+MIGRATION_MAKE=true npm start
 ```
 - If all goes well, the process will exit and the generated migration file location will be printed to the console. It'll look something like this:
 ```
