@@ -4,10 +4,8 @@ exports.up = function (knex, Promise) {
 
     return Promise.all([
 
-        // Table Create
     {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='tableDelta'}}
 
-        // Join Table Create
     {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='joinTableDelta'}}
 
     {{> build-column-modify-list columnDeltas=migrations.columnDeltas}}

@@ -9,12 +9,10 @@
     }),
     {{/each}}
 
-    // Table delete not yet supported
     {{#each tableDelta.drop}}
     knex.schema.dropTable('{{this}}'),
     {{/each}}
 
-    // Table nameChange not yet supported
     {{#each tableDelta.alter}}
     knex.schema.renameTable('{{this}}').
     {{/each}}
