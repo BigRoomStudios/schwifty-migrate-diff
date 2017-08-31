@@ -3,6 +3,7 @@
 {{#each columnDeltas}}
 {{#each changes}}
     {{#if (itemNotInArray this.model @root.createdTables)}}
+    {{#if (someObjectPropsHaveLength this)}}
     knex.schema.alterTable('{{this.model}}', function(table) {
 
         {{#each this.create}}
@@ -15,6 +16,7 @@
         table.{{this.columnType}}('{{this.columnName}}');
         {{/each}}
     }),
+    {{/if}}
     {{/if}}
 {{/each}}
 {{/each}}
