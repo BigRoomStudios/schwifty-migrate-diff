@@ -21,7 +21,8 @@
     "objection",
     "database",
     "migration",
-    "orm"
+    "orm",
+    "schwifty"
   ],
   "author": "William Woodruff <bill@bigroomstudios.com>",
   "license": "MIT",
@@ -41,11 +42,17 @@
     "hapi": ">=10 <17"
   },
   "devDependencies": {
+    "bluebird": "^3.5.0",
     "code": "4.x.x",
     "coveralls": "^2.11.15",
     "eslint": "^3.12.2",
     "glue": "^4.1.0",
     "hapi": "^16.1.0",
-    "lab": "11.x.x"
+    "lab": "11.x.x",
+    "lodash": "^4.17.4",
+    "mysql": "^2.13.0",
+    "objection": "^0.8.9",
+    "pg": "^6.2.2",
+    "schwifty": "^2.0.0"
   }
 }
