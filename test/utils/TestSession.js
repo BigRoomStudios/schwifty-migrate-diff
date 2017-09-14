@@ -59,7 +59,7 @@ class TestSession {
 
     getModels_forStep(stepName) {
 
-        const possibleSteps = ['step1_create', 'step2_alter', 'step3_drop', 'step4_all'];
+        const possibleSteps = ['create', 'alter', 'drop', 'all'];
 
         Hoek.assert(possibleSteps.indexOf(stepName) !== -1, 'You picked a bad step');
 
@@ -72,7 +72,7 @@ class TestSession {
         })
         .map((model) => {
 
-            return model.bindKnex(this.knex);
+            return model.bindKnex(this.knex); // This map is mostly for documentation
         });
     }
 

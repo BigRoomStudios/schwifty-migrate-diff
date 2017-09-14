@@ -12,9 +12,9 @@ module.exports = ({ session, testUtils }) => {
     const { expect, lab: { describe, it } } = testUtils;
 
     const clientName = session.options.knexConfig.client;
-    const stepName = 'step1_create';
+    const stepName = 'create';
 
-    console.log(`Begin "${stepName}" step for "${clientName}"`);
+    console.log(`Begin "${stepName}" tests for "${clientName}"`);
 
     describe(clientName + '_create', () => {
 
@@ -25,7 +25,8 @@ module.exports = ({ session, testUtils }) => {
                     models: session.getModels_forStep(stepName),
                     migrationsDir: Path.join(__dirname, 'migrations', clientName, 'actual', stepName),
                     knex: session.knex
-                }]
+                }],
+                mode: 'test'
             }, () => {
 
                 expect('ayooo!').to.equal('ayooo!');
