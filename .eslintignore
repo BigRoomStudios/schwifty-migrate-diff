@@ -1,1 +1,3 @@
 node_modules/*
+test/migrations/**/*schwifty-migration.js
+test/migrations/expected/**/*.js

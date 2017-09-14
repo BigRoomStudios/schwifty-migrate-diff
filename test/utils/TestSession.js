@@ -57,13 +57,13 @@ class TestSession {
         return Knex(options.knexConfig);
     }
 
-    getModels_forStep(stepName) {
+    getModels_forStep(stepName, actualFileName) {
 
         const possibleSteps = ['create', 'alter', 'drop', 'all'];
 
         Hoek.assert(possibleSteps.indexOf(stepName) !== -1, 'You picked a bad step');
 
-        const modelsPath = Path.join(__dirname, '../models', stepName);
+        const modelsPath = Path.join(__dirname, '../models', stepName, actualFileName);
 
         return Fs.readdirSync(modelsPath)
         .map((modelFileName) => {

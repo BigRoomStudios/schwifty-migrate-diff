@@ -12,10 +12,12 @@ const TestSession = require('./utils/TestSession');
 const lab = exports.lab = Lab.script();
 const expect = Code.expect;
 const { describe, it, before } = lab;
+const Utils = require('./utils');
 
 const testUtils = {
     lab,
-    expect
+    expect,
+    utils: Utils
 };
 
 // const testDbs = ['sqlite3', 'mysql', 'postgres'];
@@ -57,8 +59,9 @@ describe('SchwiftyMigration', () => {
 
             // Step 1 Create
             require('./create')({ session, testUtils });
-
         });
+
+        done();
     });
 
     // it('alters columns', (done) => {
