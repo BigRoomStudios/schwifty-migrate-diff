@@ -3,17 +3,17 @@
 exports.up = function (knex, Promise) {
 
     return Promise.all([
-    {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='tableDelta'}}
-    {{> build-table-create-list tableDeltas=migrations.tableDeltas tableType='joinTableDelta'}}
-    {{> build-column-modify-list columnDeltas=migrations.columnDeltas}}
+    {{> build-table-create-list tableType='tableDelta'}}
+    {{> build-table-create-list tableType='joinTableDelta'}}
+    {{> build-column-modify-list}}
     ])
 };
 
 exports.down = function (knex, Promise) {
 
     return Promise.all([
-    {{> build-table-drop-list tableDeltas=migrations.tableDeltas tableType='tableDelta'}}
-    {{> build-table-drop-list tableDeltas=migrations.tableDeltas tableType='joinTableDelta'}}
-    {{> build-column-unmodify-list columnDeltas=migrations.columnDeltas}}
+    {{> build-table-drop-list tableType='tableDelta'}}
+    {{> build-table-drop-list tableType='joinTableDelta'}}
+    {{> build-column-unmodify-list}}
     ])
 };

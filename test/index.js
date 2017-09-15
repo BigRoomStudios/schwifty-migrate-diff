@@ -6,6 +6,7 @@ const Lab = require('lab');
 const Code = require('code');
 const KnexConfigs = require('./knexfile');
 const TestSession = require('./utils/TestSession');
+const TestSuiteRunner = require('./utils/TestSuiteRunner');
 
 // Test shortcuts
 
@@ -53,12 +54,13 @@ describe('SchwiftyMigration', () => {
 
     // Run incremental migrations
 
-    it('creates new models and columns', (done) => {
+    it('creates new tables and columns', (done) => {
 
         testSessions.forEach((session) => {
 
-            // Step 1 Create
-            require('./create')({ session, testUtils });
+            // Run migration tests for `create`
+            const createRunner = new TestSuiteRunner('create', session, testUtils);
+            createRunner.genTests();
         });
 
         done();

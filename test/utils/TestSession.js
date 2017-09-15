@@ -41,6 +41,7 @@ class TestSession {
         TestSession.init();
 
         this.options = options;
+        this.client = options.knexConfig.client;
         this.knex = this.createKnex(options);
 
         // Check db connectivity
@@ -55,25 +56,6 @@ class TestSession {
     createKnex(options) {
 
         return Knex(options.knexConfig);
-    }
-
-    getModels_forStep(stepName, actualFileName) {
-
-        const possibleSteps = ['create', 'alter', 'drop', 'all'];
-
-        Hoek.assert(possibleSteps.indexOf(stepName) !== -1, 'You picked a bad step');
-
-        const modelsPath = Path.join(__dirname, '../models', stepName, actualFileName);
-
-        return Fs.readdirSync(modelsPath)
-        .map((modelFileName) => {
-
-            return require(Path.join(modelsPath, modelFileName));
-        })
-        .map((model) => {
-
-            return model.bindKnex(this.knex); // This map is mostly for documentation
-        });
     }
 
     initDb(cb) {

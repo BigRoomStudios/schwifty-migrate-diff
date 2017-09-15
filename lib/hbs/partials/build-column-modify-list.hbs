@@ -1,4 +1,4 @@
-{{#each columnDeltas}}
+{{#each @root.columnDeltas}}
 {{#each changes}}
     {{#if (itemNotInArray this.model @root.createdTables)}}
     {{#if (someObjectPropsHaveLength this)}}
