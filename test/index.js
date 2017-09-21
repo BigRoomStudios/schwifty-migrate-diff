@@ -4,9 +4,12 @@
 
 const Lab = require('lab');
 const Code = require('code');
+const Path = require('path');
+const Fs = require('fs');
 const KnexConfigs = require('./knexfile');
 const TestSession = require('./utils/TestSession');
 const TestSuiteRunner = require('./utils/TestSuiteRunner');
+const SchwiftyMigration = require('../lib');
 
 // Test shortcuts
 
@@ -28,7 +31,7 @@ describe('SchwiftyMigration', () => {
 
     const testSessions = [];
 
-    before(() => {
+    before({ timeout: 10000 }, () => {
 
         const promises = KnexConfigs.filter((knexConfig) => {
 
@@ -52,19 +55,86 @@ describe('SchwiftyMigration', () => {
         return Promise.all(promises);
     });
 
-    // Run incremental migrations
+    it('throws if you give bad options', (done) => {
 
-    it('creates new tables and columns', (done) => {
+        expect(() => {
 
-        testSessions.forEach((session) => {
-
-            // Run migration tests for `create`
-            const createRunner = new TestSuiteRunner('create', session, testUtils);
-            createRunner.genTests();
-        });
+            SchwiftyMigration.genMigrationFile({
+                invalid: 'options!'
+            });
+        }).to.throw(/Bad options passed to schwifty-migration/);
 
         done();
     });
+
+    it('returns early if models are empty', (done) => {
+
+        // This returns early enough that the other options aren't
+        // used, so bogus ones can be passed here
+
+        SchwiftyMigration.genMigrationFile({
+            models: [],
+            migrationsDir: 'some/path',
+            knex: class MyKnex {},
+            mode: 'test'
+        }, (err) => {
+
+            expect(err).to.not.exist();
+            done();
+        });
+    });
+
+    it('accepts absolute and relative migration file paths', (done) => {
+
+        const session = testSessions[0];
+
+        const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+        const relativePath = './test/migration-tests/migrations';
+
+        SchwiftyMigration.genMigrationFile({
+            models: [require('./migration-tests/Dog')],
+            migrationsDir: absolutePath,
+            knex: session.knex,
+            mode: 'test'
+        }, (err) => {
+
+            expect(err).to.not.exist();
+
+            SchwiftyMigration.genMigrationFile({
+                models: [require('./migration-tests/Dog')],
+                migrationsDir: relativePath,
+                knex: session.knex,
+                mode: 'test'
+            }, (err) => {
+
+                expect(err).to.not.exist();
+
+                Fs.readdirSync(absolutePath)
+                .forEach((migrationFile) => {
+
+                    const filePath = Path.join(absolutePath, migrationFile);
+                    Fs.unlinkSync(filePath);
+                });
+
+                Fs.rmdirSync(absolutePath);
+                done();
+            });
+        });
+    });
+
+    // Run incremental migrations
+    //
+    // it('creates new tables and columns', (done) => {
+    //
+    //     testSessions.forEach((session) => {
+    //
+    //         // Run migration tests for `create`
+    //         const createRunner = new TestSuiteRunner('create', session, testUtils);
+    //         createRunner.genTests();
+    //     });
+    //
+    //     done();
+    // });
 
     // it('alters columns', (done) => {
     //
