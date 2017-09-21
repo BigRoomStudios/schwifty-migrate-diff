@@ -3,9 +3,7 @@
 exports.up = function (knex, Promise) {
 
     return Promise.all([
-
         knex.schema.createTableIfNotExists('Zombie', function(table) {
-
             table.json('address');
             table.integer('age');
             table.string('favoriteFood');
