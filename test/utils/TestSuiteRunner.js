@@ -13,7 +13,11 @@ module.exports = class TestRunner {
         this.testUtils = testUtils;
 
         this.testSuitePath = Path.join(__dirname, '../migration-tests', testType);
-        this.testsInSuite = Fs.readdirSync(this.testSuitePath);
+        this.testsInSuite = Fs.readdirSync(this.testSuitePath).filter((maybeDir) => {
+
+            const stats = Fs.statSync(Path.join(this.testSuitePath, maybeDir));
+            return stats.isDirectory();
+        });
     }
 
     genTests() {
