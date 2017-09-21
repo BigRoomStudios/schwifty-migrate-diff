@@ -27,7 +27,12 @@ module.exports = class TestRunner {
                 const testPath = Path.join(this.testSuitePath, testName);
                 const testModels = this.getModels(Path.join(testPath, 'models'));
                 const itText = require(Path.join(testPath, 'it'));
-                const migrationsDir = Path.join(testPath, 'migrations');
+                const migrationsDir = Path.join(testPath, 'migrations', this.session.options.knexConfig.client);
+
+                if (!Fs.existsSync(migrationsDir)) {
+                    Fs.mkdirSync(migrationsDir);
+                }
+
                 const expectedMigrationPath = Path.join(testPath, 'expected-migration.js');
 
                 it(itText, (done) => {
