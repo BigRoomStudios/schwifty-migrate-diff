@@ -25,13 +25,16 @@ const testUtils = {
 };
 
 // const testDbs = ['sqlite3', 'mysql', 'postgres'];
+// const testDbs = ['postgres', 'mysql'];
 const testDbs = ['postgres'];
 
 describe('SchwiftyMigration', () => {
 
-    const testSessions = [];
+    let initSessions = [];
 
-    before({ timeout: 10000 }, () => {
+    const getSessions = () => {
+
+        const sessions = [];
 
         const promises = KnexConfigs.filter((knexConfig) => {
 
@@ -44,15 +47,27 @@ describe('SchwiftyMigration', () => {
 
                 // Create all the test sessions
 
-                testSessions.push(new TestSession({ knexConfig }, () => {
+                sessions.push(new TestSession({ knexConfig }, () => {
 
-                    console.log(knexConfig.client + ' initialized!');
-                    resolve();
+                    resolve(...sessions);
                 }));
             });
         });
 
         return Promise.all(promises);
+    }
+
+    before({ timeout: 10000 }, () => {
+
+        return new Promise((resolve, reject) => {
+
+            getSessions()
+            .then((args) => {
+
+                initSessions = args;
+                resolve(args);
+            });
+        });
     });
 
     it('throws if you give bad options', (done) => {
@@ -86,7 +101,7 @@ describe('SchwiftyMigration', () => {
 
     it('accepts absolute and relative migration file paths', (done) => {
 
-        const session = testSessions[0];
+        const session = initSessions[0];
 
         const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
         const relativePath = './test/migration-tests/migrations';
@@ -123,18 +138,18 @@ describe('SchwiftyMigration', () => {
     });
 
     // Run incremental migrations
-    //
-    // it('creates new tables and columns', (done) => {
-    //
-    //     testSessions.forEach((session) => {
-    //
-    //         // Run migration tests for `create`
-    //         const createRunner = new TestSuiteRunner('create', session, testUtils);
-    //         createRunner.genTests();
-    //     });
-    //
-    //     done();
-    // });
+
+    it('creates new tables and columns', (done) => {
+
+        initSessions.forEach((session) => {
+
+            // Run migration tests for `create`
+            const createRunner = new TestSuiteRunner('create', session, testUtils);
+            createRunner.genTests();
+        });
+
+        done();
+    });
 
     // it('alters columns', (done) => {
     //

@@ -20,13 +20,29 @@ module.exports = class TestRunner {
         });
     }
 
-    genTests() {
+    genTests(stepsToGen) {
+
+        const stepsToFilterFor = [].concat(stepsToGen).filter((item) => item);
 
         const { expect, lab: { describe, it }, utils } = this.testUtils;
 
-        describe(`"${this.testType}" tests:`, () => {
+        let filteredTests = this.testsInSuite;
 
-            this.testsInSuite.forEach((testName) => {
+        if (stepsToFilterFor.length > 0) {
+            filteredTests = this.testsInSuite.filter((testName) => {
+
+                return stepsToFilterFor.find((filterSearch) => {
+
+                    return testName.indexOf(filterSearch) !== -1;
+                });
+            });
+
+            console.log('Tests filtered to run:', filteredTests);
+        };
+
+        describe(`"${this.session.options.knexConfig.client} ${this.testType}" tests:`, () => {
+
+            filteredTests.forEach((testName) => {
 
                 const testPath = Path.join(this.testSuitePath, testName);
                 const testModels = this.getModels(Path.join(testPath, 'models'));
