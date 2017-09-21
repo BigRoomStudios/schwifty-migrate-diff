@@ -10,7 +10,7 @@ const TestSuiteRunner = require('./utils/TestSuiteRunner');
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
+const lab = exports.lab = Lab.script({ schedule: false });
 const expect = Code.expect;
 const { describe, it, before } = lab;
 const Utils = require('./utils');

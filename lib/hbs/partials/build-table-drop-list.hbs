@@ -1,5 +1,3 @@
-{{#each @root.tableDeltas}}
-    {{#each (keyFromObject 'create' (keyFromObject ../tableType this))}}
+    {{#each (keyFromObject 'create' (keyFromObject tableType @root.tableDeltas))}}
     knex.schema.dropTable('{{this}}'),
     {{/each}}
-{{/each}}
