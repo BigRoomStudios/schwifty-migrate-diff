@@ -55,7 +55,7 @@ describe('SchwiftyMigration', () => {
         });
 
         return Promise.all(promises);
-    }
+    };
 
     before({ timeout: 10000 }, () => {
 
