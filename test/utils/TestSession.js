@@ -2,11 +2,9 @@
 
 const _ = require('lodash');
 const Path = require('path');
-const Fs = require('fs');
 const { Promise } = require('objection');
 const Knex = require('knex');
 
-const Hoek = require('hoek');
 const Joi = require('joi');
 const KnexUtils = require('./knexUtils');
 

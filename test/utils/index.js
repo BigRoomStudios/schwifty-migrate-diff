@@ -1,3 +1,4 @@
+'use strict';
 
 const Fs = require('fs');
 const Path = require('path');
@@ -11,4 +12,4 @@ module.exports = {
         const latestMigrationPath = Path.resolve(migrationDirPath, latestMigration);
         return Fs.readFileSync(latestMigrationPath).toString('utf8');
     }
-}
+};

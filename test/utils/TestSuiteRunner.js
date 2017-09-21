@@ -1,7 +1,7 @@
+'use strict';
 
 const Path = require('path');
 const Fs = require('fs');
-const Hoek = require('hoek');
 const SchwiftyMigration = require('../../lib');
 
 module.exports = class TestRunner {
@@ -27,7 +27,12 @@ module.exports = class TestRunner {
                 const testPath = Path.join(this.testSuitePath, testName);
                 const testModels = this.getModels(Path.join(testPath, 'models'));
                 const itText = require(Path.join(testPath, 'it'));
-                const migrationsDir = Path.join(testPath, 'migrations', this.session.options.knexConfig.client);
+                const parentMigrationsDir = Path.join(testPath, 'migrations');
+                const migrationsDir = Path.join(parentMigrationsDir, this.session.options.knexConfig.client);
+
+                if (!Fs.existsSync(parentMigrationsDir)) {
+                    Fs.mkdirSync(parentMigrationsDir);
+                }
 
                 if (!Fs.existsSync(migrationsDir)) {
                     Fs.mkdirSync(migrationsDir);

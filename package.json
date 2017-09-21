@@ -36,7 +36,8 @@
     "inquirer": "^2.0.0",
     "items": "^2.1.1",
     "jsondiffpatch": "^0.2.4",
-    "knex": "^0.13.0"
+    "knex": "^0.13.0",
+    "toys": "^1.0.0"
   },
   "peerDependencies": {
     "hapi": ">=10 <17"
