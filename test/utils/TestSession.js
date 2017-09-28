@@ -4,6 +4,7 @@ const _ = require('lodash');
 const Path = require('path');
 const { Promise } = require('objection');
 const Knex = require('knex');
+const Hoek = require('hoek');
 
 const Joi = require('joi');
 const KnexUtils = require('./knexUtils');
@@ -32,7 +33,13 @@ class TestSession {
         });
     }
 
-    constructor(options, onReady) {
+    static cloneSession(session, next) {
+
+        const options = Hoek.shallow(session.options);
+        return new TestSession({ options, next });
+    }
+
+    constructor({ options, next }) {
 
         Joi.assert(options, TestSession.optionsSchema);
 
@@ -47,7 +54,7 @@ class TestSession {
         this.initDb()
         .then(() => {
 
-            onReady();
+            next();
         });
     }
 

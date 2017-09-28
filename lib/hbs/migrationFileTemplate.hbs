@@ -2,18 +2,12 @@
 
 exports.up = function (knex, Promise) {
 
-    return Promise.all([
-    {{> build-table-create-list tableType='tableDelta'}}
-    {{> build-table-create-list tableType='joinTableDelta'}}
-    {{> build-column-modify-list}}
-    ])
+    return knex.schema
+{{> build-table-create-list tableType='tableDelta'}}{{> build-table-create-list tableType='joinTableDelta'}}{{> build-column-modify-list}}
 };
 
 exports.down = function (knex, Promise) {
 
-    return Promise.all([
-    {{> build-table-drop-list tableType='tableDelta'}}
-    {{> build-table-drop-list tableType='joinTableDelta'}}
-    {{> build-column-unmodify-list}}
-    ])
+    return knex.schema
+{{> build-table-drop-list tableType='tableDelta'}}{{> build-table-drop-list tableType='joinTableDelta'}}{{> build-column-unmodify-list}}
 };

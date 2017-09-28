@@ -28,6 +28,8 @@ module.exports = class Movie extends Model {
                 join: {
                     from: 'Person.id',
                     through: {
+                        from: 'Person_Movie.personId',
+                        to: 'Person_Movie.movieId',
                         modelClass: require('./Person_Movie')
                     },
                     to: 'Movie.id'

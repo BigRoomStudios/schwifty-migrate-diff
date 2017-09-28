@@ -47,9 +47,12 @@ describe('SchwiftyMigration', () => {
 
                 // Create all the test sessions
 
-                sessions.push(new TestSession({ knexConfig }, () => {
+                sessions.push(new TestSession({
+                    options: { knexConfig },
+                    next: () => {
 
-                    resolve(...sessions);
+                        resolve(...sessions);
+                    }
                 }));
             });
         });

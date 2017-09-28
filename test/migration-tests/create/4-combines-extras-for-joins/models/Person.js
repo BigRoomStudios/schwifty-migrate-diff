@@ -3,11 +3,11 @@
 const Joi = require('joi');
 const Model = require('schwifty').Model;
 
-module.exports = class Person1 extends Model {
+module.exports = class Person extends Model {
 
     static get tableName() {
 
-        return 'Person1';
+        return 'Person';
     }
 
     static get joiSchema() {
@@ -32,15 +32,15 @@ module.exports = class Person1 extends Model {
         return {
             movies: {
                 relation: Model.ManyToManyRelation,
-                modelClass: require('./Movie1'),
+                modelClass: require('./Movie'),
                 join: {
-                    from: 'Movie1.id',
+                    from: 'Movie.id',
                     through: {
-                        from: 'Person_Movie1.movieId',
+                        from: 'Person_Movie.movieId',
                         extra: ['three-extra', 'four-extra'],
-                        to: 'Person_Movie1.personId'
+                        to: 'Person_Movie.personId'
                     },
-                    to: 'Person1.id'
+                    to: 'Person.id'
                 }
             }
         };
