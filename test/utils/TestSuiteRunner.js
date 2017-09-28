@@ -118,8 +118,6 @@ module.exports = class TestRunner {
                         if (seedMigration) {
 
                             // This is a func in test/index.js
-                            console.log('SeTTING Options for after');
-                            console.log('seedPath', seedPath);
                             this.testUtils.setOptionsForAfter(session, seedPath);
 
                             session.knex.migrate.latest({
