@@ -18,10 +18,67 @@ const expect = Code.expect;
 const { describe, it, before } = lab;
 const Utils = require('./utils');
 
+const internals = {};
+
+
+const rollbackDb = (session, rollbackPath, next) => {
+
+    const { knex } = session;
+    const config = Object.assign(
+        {},
+        session.options.knexConfig,
+        { directory: rollbackPath }
+    );
+
+    knex.migrate.currentVersion()
+    .then((cv) => {
+
+        if (cv !== 'none') {
+            return knex.migrate.rollback(config)
+            .then(() => {
+
+                rollbackDb(session, rollbackPath, next);
+            })
+            .catch(next);
+        }
+        next();
+    });
+}
+
+lab.afterEach((done) => {
+
+    // setOptionsForAfter() sets these, and setOptionsForAfter()
+    // gets called in the TestRunner
+
+    const { sessionForAfter, rollbackPath } = internals;
+
+    if (sessionForAfter) {
+
+        // Wipe the db!
+
+        rollbackDb(sessionForAfter, rollbackPath, () => {
+
+            internals.sessionForAfter = undefined;
+            done();
+        });
+    }
+    else {
+        internals.sessionForAfter = undefined;
+        done();
+    }
+});
+
+const setOptionsForAfter = (session, rollbackPath) => {
+
+    internals.sessionForAfter = session;
+    internals.rollbackPath = rollbackPath;
+};
+
 const testUtils = {
     lab,
     expect,
-    utils: Utils
+    utils: Utils,
+    setOptionsForAfter
 };
 
 // const testDbs = ['sqlite3', 'mysql', 'postgres'];

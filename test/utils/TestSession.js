@@ -33,9 +33,19 @@ class TestSession {
         });
     }
 
-    static cloneSession(session, next) {
+    static cloneSession(session, overrideOptions, next) {
 
-        const options = Hoek.shallow(session.options);
+        if (typeof overrideOptions === 'function') {
+            next = overrideOptions;
+            overrideOptions = {};
+        }
+
+        const options = Object.assign(
+            {},
+            Hoek.shallow(session.options),
+            overrideOptions || {}
+        );
+
         return new TestSession({ options, next });
     }
 
