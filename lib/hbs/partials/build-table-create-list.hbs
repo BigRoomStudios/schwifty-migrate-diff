@@ -1,9 +1,9 @@
     {{#each (keyFromObject 'create' (keyFromObject tableType @root.tableDeltas))}}
-    .createTableIfNotExists('{{this}}', function(table) {
-        {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
-        table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
-        {{/each}}
-    })
+        .createTableIfNotExists('{{this}}', (table) => {
+            {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
+            table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
+            {{/each}}
+        })
     {{/each}}
     {{#each tableDelta.drop}}
     knex.schema.dropTable('{{this}}'),

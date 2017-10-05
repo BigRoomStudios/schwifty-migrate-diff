@@ -1,16 +1,16 @@
 {{#each @root.columnDeltas.changes}}
 {{#if (itemNotInArray this.model @root.createdTables)}}
 {{#if (someObjectPropsHaveValue this)}}
-    .alterTable('{{this.model}}', function(table) {
-        {{#each this.create}}
-        table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this.model @root.allTables))}}('{{this}}');
-        {{/each}}
-        {{#each (objectKeys this.alter)}}
-        table.{{indexFromArray 1 (keyFromObject this ../this.alter)}}('{{this}}').alter();
-        {{/each}}
-        {{#each this.drop}}
-        table.dropColumn('{{this.columnName}}')
-        {{/each}}
+        .alterTable('{{this.model}}', (table) => {
+            {{#each this.create}}
+            table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this.model @root.allTables))}}('{{this}}');
+            {{/each}}
+            {{#each (objectKeys this.alter)}}
+            table.{{indexFromArray 1 (keyFromObject this ../this.alter)}}('{{this}}').alter();
+            {{/each}}
+            {{#each this.drop}}
+            table.dropColumn('{{this.columnName}}')
+            {{/each}}
     })
 {{/if}}
 {{/if}}

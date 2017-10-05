@@ -46,7 +46,7 @@ module.exports = class TestRunner {
 
             filteredTests.forEach((testName) => {
 
-                const session = this.session;
+                const rootSession = this.session;
                 const testPath = Path.join(this.testSuitePath, testName);
                 const itText = require(Path.join(testPath, 'it'));
                 const seedPath = Path.join(testPath, 'seed');
@@ -57,7 +57,7 @@ module.exports = class TestRunner {
                 }
 
                 const parentMigrationsDir = Path.join(testPath, 'migrations');
-                const migrationsDir = Path.join(parentMigrationsDir, session.options.knexConfig.client);
+                const migrationsDir = Path.join(parentMigrationsDir, rootSession.options.knexConfig.client);
 
                 if (!Fs.existsSync(parentMigrationsDir)) {
                     Fs.mkdirSync(parentMigrationsDir);
@@ -71,7 +71,7 @@ module.exports = class TestRunner {
 
                 it(itText, (done) => {
 
-                    // Clone a new session for each test!
+                    // Clone a new session for each test
                     // This also wipes the db for a fresh start =)
 
                     const session = TestSession.cloneSession(this.session, () => {

@@ -1,21 +1,21 @@
 'use strict';
 
-exports.up = function (knex, Promise) {
+exports.up = (knex, Promise) => {
 
     return knex.schema
-    .alterTable('Person', function(table) {
-        table.integer('age');
-        table.json('address');
+        .alterTable('Person', (table) => {
+            table.integer('age');
+            table.json('address');
     })
 
 };
 
-exports.down = function (knex, Promise) {
+exports.down = (knex, Promise) => {
 
     return knex.schema
-    .alterTable('Person', function(table) {
-        table.dropColumn('age');
-        table.dropColumn('address');
+        .alterTable('Person', (table) => {
+            table.dropColumn('age');
+            table.dropColumn('address');
     })
 
 };

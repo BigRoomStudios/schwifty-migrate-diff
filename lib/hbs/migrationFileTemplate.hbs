@@ -1,13 +1,19 @@
 'use strict';
 
-exports.up = function (knex, Promise) {
+exports.up = (knex, Promise) => {
 
     return knex.schema
-{{> build-table-create-list tableType='tableDelta'}}{{> build-table-create-list tableType='joinTableDelta'}}{{> build-column-modify-list}}
+{{> build-table-create-list tableType='tableDelta'}}
+{{> build-table-create-list tableType='joinTableDelta'}}
+{{> build-column-modify-list}}
+
 };
 
-exports.down = function (knex, Promise) {
+exports.down = (knex, Promise) => {
 
     return knex.schema
-{{> build-table-drop-list tableType='tableDelta'}}{{> build-table-drop-list tableType='joinTableDelta'}}{{> build-column-unmodify-list}}
+{{> build-table-drop-list tableType='tableDelta'}}
+{{> build-table-drop-list tableType='joinTableDelta'}}
+{{> build-column-unmodify-list}}
+
 };

@@ -2,6 +2,9 @@
 
 // Load modules
 
+const calls = [];
+console.log = (x) => calls.push(x);
+
 const Lab = require('lab');
 const Code = require('code');
 const Path = require('path');
@@ -20,6 +23,25 @@ const Utils = require('./utils');
 
 const internals = {};
 
+// Mutate console.log to keep SchwiftyMigration from printing to the console
+
+console._log = console.log;
+
+let logOutput = [];
+
+const cleanup = () => {
+
+    logOutput = [];
+    console.log = console._log;
+};
+
+lab.cleanup = cleanup;
+
+console.log = (...args) => {
+
+    logOutput.push(...args);
+    console._log(...args);
+};
 
 const rollbackDb = (session, rollbackPath, next) => {
 
@@ -43,7 +65,7 @@ const rollbackDb = (session, rollbackPath, next) => {
         }
         next();
     });
-}
+};
 
 lab.afterEach((done) => {
 
@@ -159,6 +181,7 @@ describe('SchwiftyMigration', () => {
         });
     });
 
+
     it('accepts absolute and relative migration file paths', (done) => {
 
         const session = initSessions[0];
@@ -191,9 +214,78 @@ describe('SchwiftyMigration', () => {
                     Fs.unlinkSync(filePath);
                 });
 
-                Fs.rmdirSync(absolutePath);
                 done();
             });
+        });
+    });
+
+
+    // it('Prints to the console on no migration (no-op)', (done) => {
+    //
+    //     const session = initSessions[0];
+    //     const relativePath = './test/migration-tests/migrations';
+    //
+    //     const seedPath = Path.join(relativePath, 'seed');
+    //
+    //     testUtils.setOptionsForAfter(session, seedPath);
+    //
+    //     session.knex.migrate.latest({
+    //         directory: seedPath
+    //     })
+    //     .then(() => {
+    //
+    //         SchwiftyMigration.genMigrationFile({
+    //             models: [require('./migration-tests/Zombie')],
+    //             migrationsDir: relativePath,
+    //             knex: session.knex,
+    //             mode: 'create'
+    //         }, (err) => {
+    //
+    //             expect(err).to.not.exist();
+    //
+    //             expect(logOutput[0].includes('//////////////')).to.equal(true);
+    //             expect(logOutput[1].includes('Models up to date')).to.equal(true);
+    //             expect(logOutput[2].includes('No migration needed')).to.equal(true);
+    //
+    //             Fs.readdirSync(relativePath)
+    //             .forEach((migrationFile) => {
+    //
+    //                 // If its a file remove it
+    //                 // const filePath = Path.join(relativePath, migrationFile);
+    //                 // Fs.unlinkSync(filePath);
+    //             });
+    //
+    //             done();
+    //         });
+    //     });
+    // });
+
+    it('Prints to the console on successful migration', (done) => {
+
+        const session = initSessions[0];
+        const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+
+        SchwiftyMigration.genMigrationFile({
+            models: [require('./migration-tests/Dog')],
+            migrationsDir: absolutePath,
+            knex: session.knex,
+            mode: 'create'
+        }, (err) => {
+
+            expect(err).to.not.exist();
+
+            expect(logOutput[0].includes('//////////////')).to.equal(true);
+            expect(logOutput[1].includes('Success!')).to.equal(true);
+            expect(logOutput[2].includes('Generated new migration file:')).to.equal(true);
+
+            Fs.readdirSync(absolutePath)
+            .forEach((migrationFile) => {
+
+                const filePath = Path.join(absolutePath, migrationFile);
+                Fs.unlinkSync(filePath);
+            });
+
+            done();
         });
     });
 
