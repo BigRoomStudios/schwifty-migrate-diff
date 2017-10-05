@@ -211,13 +211,15 @@ describe('SchwiftyMigration', () => {
         done();
     });
 
-    // it('alters columns', (done) => {
-    //
-    //     testSessions.forEach((session) => {
-    //
-    //         // Step 1 Create
-    //         require('./alter')({ session, testUtils });
-    //
-    //     });
-    // });
+    it('alters tables', (done) => {
+
+        initSessions.forEach((session) => {
+
+            // Run migration tests for `alter`
+            const createRunner = new TestSuiteRunner('alter', session, testUtils);
+            createRunner.genTests();
+        });
+
+        done();
+    });
 });

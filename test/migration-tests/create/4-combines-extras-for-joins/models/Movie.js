@@ -13,7 +13,7 @@ module.exports = class Movie extends Model {
     static get joiSchema() {
 
         return Joi.object({
-            id: Joi.number(),
+            id: Joi.number().integer(),
             title: Joi.string(),
             subTitle: Joi.string()
         });

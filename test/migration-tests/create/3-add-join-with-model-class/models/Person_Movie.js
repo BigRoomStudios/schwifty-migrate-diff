@@ -13,8 +13,8 @@ module.exports = class Person_Movie extends Model {
     static get joiSchema() {
 
         return Joi.object({
-            personId: Joi.string(),
-            movieId: Joi.string()
+            personId: Joi.number().integer(),
+            movieId: Joi.number().integer()
         });
     }
 };

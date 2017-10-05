@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "lab -a code -t 100 -L -I '__core-js_shared__'",
+    "test:html": "lab -a code -t 100 -r html -o test.html -L -I '__core-js_shared__'",
     "lint": "eslint .",
     "coveralls": "lab -r lcov | coveralls"
   },

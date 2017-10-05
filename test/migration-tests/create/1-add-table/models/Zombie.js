@@ -13,7 +13,7 @@ module.exports = class Zombie extends Model {
     static get joiSchema() {
 
         return Joi.object({
-            id: Joi.number(),
+            id: Joi.number().integer(),
             firstName: Joi.string(),
             lastName: Joi.string(),
 

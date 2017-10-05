@@ -16,8 +16,8 @@ exports.up = function (knex, Promise) {
         table.string('lastName');
     })
     .createTableIfNotExists('Person_Movie', function(table) {
-        table.string('movieId');
-        table.string('personId');
+        table.integer('movieId');
+        table.integer('personId');
     })
 
 };
