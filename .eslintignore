@@ -2,3 +2,4 @@ node_modules/*
 test/migration-tests/**/migrations/
 test/**/expected-migration.js
 it.js
+test/**/seed/

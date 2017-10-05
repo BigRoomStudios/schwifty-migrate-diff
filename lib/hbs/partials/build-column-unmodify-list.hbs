@@ -1,17 +1,17 @@
 {{#each @root.columnDeltas.changes}}
 {{#if (itemNotInArray this.model @root.createdTables)}}
-{{#if (someObjectPropsHaveLength this)}}
+{{#if (someObjectPropsHaveValue this)}}
     .alterTable('{{this.model}}', function(table) {
-        {{#each (sort this.create)}}
+        {{#each this.create}}
         table.dropColumn('{{this}}');
         {{/each}}
-        {{#each (sort (objectKeys this.alter))}}
+        {{#each (objectKeys this.alter)}}
         table.{{indexFromArray 0 (keyFromObject this ../this.alter)}}('{{this}}').alter();
         {{/each}}
-        {{#each (sort this.drop)}}
+        {{#each this.drop}}
         table.{{this.columnType}}('{{this.columnName}}');
         {{/each}}
     })
-    {{/if}}
-    {{/if}}
+{{/if}}
+{{/if}}
 {{/each}}

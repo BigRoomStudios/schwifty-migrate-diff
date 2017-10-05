@@ -3,13 +3,12 @@
 exports.up = function (knex, Promise) {
 
     return knex.schema
-    .createTableIfNotExists('Zombie', function(table) {
-        table.integer('id');
-        table.string('firstName');
-        table.string('lastName');
-        table.integer('age');
+    .createTableIfNotExists('Person', function(table) {
         table.json('address');
-        table.string('favoriteFood');
+        table.integer('age');
+        table.string('firstName');
+        table.integer('id');
+        table.string('lastName');
     })
 
 };
@@ -17,6 +16,6 @@ exports.up = function (knex, Promise) {
 exports.down = function (knex, Promise) {
 
     return knex.schema
-    .dropTable('Zombie')
+    .dropTable('Person')
 
 };

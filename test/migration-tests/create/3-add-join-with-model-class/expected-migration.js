@@ -5,19 +5,19 @@ exports.up = function (knex, Promise) {
     return knex.schema
     .createTableIfNotExists('Movie', function(table) {
         table.integer('id');
-        table.string('subTitle');
         table.string('title');
+        table.string('subTitle');
     })
     .createTableIfNotExists('Person', function(table) {
-        table.json('address');
-        table.integer('age');
-        table.string('firstName');
         table.integer('id');
+        table.string('firstName');
         table.string('lastName');
+        table.integer('age');
+        table.json('address');
     })
     .createTableIfNotExists('Person_Movie', function(table) {
-        table.integer('movieId');
         table.integer('personId');
+        table.integer('movieId');
     })
 
 };

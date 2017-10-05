@@ -4,8 +4,8 @@ exports.up = function (knex, Promise) {
 
     return knex.schema
     .alterTable('Person', function(table) {
-        table.integer('age');
-        table.json('address');
+        table.boolean('firstName').alter();
+        table.number('lastName').alter();
     })
 
 };
@@ -14,8 +14,8 @@ exports.down = function (knex, Promise) {
 
     return knex.schema
     .alterTable('Person', function(table) {
-        table.dropColumn('age');
-        table.dropColumn('address');
+        table.string('firstName').alter();
+        table.string('lastName').alter();
     })
 
 };

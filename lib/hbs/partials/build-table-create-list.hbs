@@ -1,4 +1,4 @@
-    {{#each (sort (keyFromObject 'create' (keyFromObject tableType @root.tableDeltas)))}}
+    {{#each (keyFromObject 'create' (keyFromObject tableType @root.tableDeltas))}}
     .createTableIfNotExists('{{this}}', function(table) {
         {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
         table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
