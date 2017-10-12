@@ -97,7 +97,12 @@ module.exports = class TestRunner {
                                 migrationName: `it-${itText.split(' ').join('-')}`
                             }, (err) => {
 
-                                expect(err).to.not.exist();
+                                if (err) {
+                                    if (Array.isArray(err)) {
+                                        return done(new Error(`Multiple errors: "${err}"`));
+                                    }
+                                    return done(err);
+                                }
 
                                 const actualMigrationContents = utils.getLatestMigration(migrationsDir);
                                 const expectedMigrationContents = Fs.readFileSync(expectedMigrationPath).toString('utf8');

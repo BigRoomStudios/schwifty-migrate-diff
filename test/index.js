@@ -276,7 +276,24 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    // Run incremental migrations
+    it('errors on unsupported Joi schema', (done) => {
+
+        const session = initSessions[0];
+        const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+
+        SchwiftyMigration.genMigrationFile({
+            models: [require('./migration-tests/BadPerson')],
+            migrationsDir: absolutePath,
+            knex: session.knex,
+            mode: 'create'
+        }, (err) => {
+
+            expect(err).to.exist();
+            expect(err.message).to.equal('Joi Schema type(s) \"alternatives\" not supported.');
+
+            done();
+        });
+    });
 
     it('creates new tables and columns', (done) => {
 
@@ -296,7 +313,7 @@ describe('SchwiftyMigration', () => {
 
             // Run migration tests for `alter`
             const createRunner = new TestSuiteRunner('alter', session, testUtils);
-            createRunner.genTests();
+            createRunner.genTests([2]);
         });
 
         done();
