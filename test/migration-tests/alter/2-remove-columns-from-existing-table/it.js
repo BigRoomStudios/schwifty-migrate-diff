@@ -1,2 +1,2 @@
 
-module.exports = 'Removes columns to existing tables';
+module.exports = 'Removes columns from existing tables';
