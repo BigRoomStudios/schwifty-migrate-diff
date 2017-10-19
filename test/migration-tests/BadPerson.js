@@ -19,7 +19,11 @@ module.exports = class Person extends Model {
 
             age: Joi.number().integer(),
 
-            address: Joi.alternatives([Joi.string(), Joi.object()])
+            // These cannot be different types, they must be the same type
+            address: Joi.alternatives([
+                Joi.string(),
+                Joi.object()
+            ])
         });
     }
 };

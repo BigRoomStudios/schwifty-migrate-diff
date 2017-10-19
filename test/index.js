@@ -41,27 +41,24 @@ const rollbackDb = (session, rollbackPath, next) => {
     );
 
     knex.migrate.currentVersion()
-    .then((cv) => {
+        .then((cv) => {
 
-        if (cv !== 'none') {
-            return knex.migrate.rollback(config)
-            .then(() => {
+            if (cv !== 'none') {
+                return knex.migrate.rollback(config)
+                    .then(() => {
 
-                rollbackDb(session, rollbackPath, next);
-            })
-            .catch(next);
-        }
-        next();
-    });
+                        rollbackDb(session, rollbackPath, next);
+                    })
+                    .catch(next);
+            }
+            next();
+        });
 };
 
 lab.afterEach((done) => {
 
     // setOptionsForAfter() sets these, and setOptionsForAfter()
     // gets called in the TestRunner
-
-    // Reset state for console log
-    logOutput = [];
 
     const { sessionForAfter, rollbackPath } = internals;
 
@@ -72,11 +69,15 @@ lab.afterEach((done) => {
         rollbackDb(sessionForAfter, rollbackPath, () => {
 
             internals.sessionForAfter = undefined;
+            // Reset state for console log
+            logOutput = [];
             done();
         });
     }
     else {
         internals.sessionForAfter = undefined;
+        // Reset state for console log
+        logOutput = [];
         done();
     }
 });
@@ -111,21 +112,21 @@ describe('SchwiftyMigration', () => {
             // Only test the dbs specified in the `testDbs` array
             return testDbs.indexOf(knexConfig.client) !== -1;
         })
-        .map((knexConfig) => {
+            .map((knexConfig) => {
 
-            return new Promise((resolve, reject) => {
+                return new Promise((resolve, reject) => {
 
-                // Create all the test sessions
+                    // Create all the test sessions
 
-                sessions.push(new TestSession({
-                    options: { knexConfig },
-                    next: () => {
+                    sessions.push(new TestSession({
+                        options: { knexConfig },
+                        next: () => {
 
-                        resolve(...sessions);
-                    }
-                }));
+                            resolve(...sessions);
+                        }
+                    }));
+                });
             });
-        });
 
         return Promise.all(promises);
     };
@@ -135,11 +136,11 @@ describe('SchwiftyMigration', () => {
         return new Promise((resolve, reject) => {
 
             getSessions()
-            .then((args) => {
+                .then((args) => {
 
-                initSessions = args;
-                resolve(args);
-            });
+                    initSessions = args;
+                    resolve(args);
+                });
         });
     });
 
@@ -198,11 +199,11 @@ describe('SchwiftyMigration', () => {
                 expect(err).to.not.exist();
 
                 Fs.readdirSync(absolutePath)
-                .forEach((migrationFile) => {
+                    .forEach((migrationFile) => {
 
-                    const filePath = Path.join(absolutePath, migrationFile);
-                    Fs.unlinkSync(filePath);
-                });
+                        const filePath = Path.join(absolutePath, migrationFile);
+                        Fs.unlinkSync(filePath);
+                    });
 
                 done();
             });
@@ -220,31 +221,31 @@ describe('SchwiftyMigration', () => {
         session.knex.migrate.latest({
             directory: seedPath
         })
-        .then(() => {
+            .then(() => {
 
-            SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/Person')],
-                migrationsDir,
-                knex: session.knex,
-                mode: 'create'
-            }, (err) => {
+                SchwiftyMigration.genMigrationFile({
+                    models: [require('./migration-tests/Person')],
+                    migrationsDir,
+                    knex: session.knex,
+                    mode: 'create'
+                }, (err) => {
 
-                expect(err).to.not.exist();
+                    expect(err).to.not.exist();
 
-                expect(logOutput[0].includes('//////////////')).to.equal(true);
-                expect(logOutput[1].includes('Models up to date')).to.equal(true);
-                expect(logOutput[2].includes('No migration needed')).to.equal(true);
+                    expect(logOutput[0].includes('//////////////')).to.equal(true);
+                    expect(logOutput[1].includes('Models up to date')).to.equal(true);
+                    expect(logOutput[2].includes('No migration needed')).to.equal(true);
 
-                Fs.readdirSync(migrationsDir)
-                .forEach((migrationFile) => {
+                    Fs.readdirSync(migrationsDir)
+                        .forEach((migrationFile) => {
 
-                    const filePath = Path.join(migrationsDir, migrationFile);
-                    Fs.unlinkSync(filePath);
+                            const filePath = Path.join(migrationsDir, migrationFile);
+                            Fs.unlinkSync(filePath);
+                        });
+
+                    done();
                 });
-
-                done();
             });
-        });
     });
 
     it('Prints to the console on successful migration', (done) => {
@@ -266,11 +267,11 @@ describe('SchwiftyMigration', () => {
             expect(logOutput[2].includes('Generated new migration file:')).to.equal(true);
 
             Fs.readdirSync(absolutePath)
-            .forEach((migrationFile) => {
+                .forEach((migrationFile) => {
 
-                const filePath = Path.join(absolutePath, migrationFile);
-                Fs.unlinkSync(filePath);
-            });
+                    const filePath = Path.join(absolutePath, migrationFile);
+                    Fs.unlinkSync(filePath);
+                });
 
             done();
         });
@@ -281,19 +282,23 @@ describe('SchwiftyMigration', () => {
         const session = initSessions[0];
         const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
-        SchwiftyMigration.genMigrationFile({
-            models: [require('./migration-tests/BadPerson')],
-            migrationsDir: absolutePath,
-            knex: session.knex,
-            mode: 'create'
-        }, (err) => {
+        expect(() => {
 
-            expect(err).to.exist();
-            expect(err.message).to.equal('Joi Schema type(s) \"alternatives\" not supported.');
+            SchwiftyMigration.genMigrationFile({
+                models: [require('./migration-tests/BadPerson')],
+                migrationsDir: absolutePath,
+                knex: session.knex,
+                mode: 'create'
+            }, (err) => {
 
-            done();
-        });
+                expect(err).to.exist();
+                done();
+            });
+        }).to.throw('Joi Schema type(s) \"alternatives\" not supported.');
+
+        done();
     });
+
 
     it('creates new tables and columns', (done) => {
 
@@ -313,7 +318,7 @@ describe('SchwiftyMigration', () => {
 
             // Run migration tests for `alter`
             const createRunner = new TestSuiteRunner('alter', session, testUtils);
-            createRunner.genTests([2]);
+            createRunner.genTests();
         });
 
         done();

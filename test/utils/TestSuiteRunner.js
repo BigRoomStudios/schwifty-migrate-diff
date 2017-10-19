@@ -83,11 +83,11 @@ module.exports = class TestRunner {
                             // empty migrationsDir folder (cleanup)
 
                             Fs.readdirSync(migrationsDir)
-                            .forEach((migrationFile) => {
+                                .forEach((migrationFile) => {
 
-                                const filePath = Path.join(migrationsDir, migrationFile);
-                                Fs.unlinkSync(filePath);
-                            });
+                                    const filePath = Path.join(migrationsDir, migrationFile);
+                                    Fs.unlinkSync(filePath);
+                                });
 
                             SchwiftyMigration.genMigrationFile({
                                 models: testModels,
@@ -128,10 +128,10 @@ module.exports = class TestRunner {
                             session.knex.migrate.latest({
                                 directory: seedPath
                             })
-                            .then((...args) => {
+                                .then((...args) => {
 
-                                dbInitialized();
-                            });
+                                    dbInitialized();
+                                });
                         }
                         else {
                             dbInitialized();
@@ -145,13 +145,13 @@ module.exports = class TestRunner {
     getModels(modelsPath, session) {
 
         return Fs.readdirSync(modelsPath)
-        .map((modelFileName) => {
+            .map((modelFileName) => {
 
-            return require(Path.join(modelsPath, modelFileName));
-        })
-        .map((model) => {
+                return require(Path.join(modelsPath, modelFileName));
+            })
+            .map((model) => {
 
-            return model.bindKnex(session.knex); // Bind to the session's knex
-        });
+                return model.bindKnex(session.knex); // Bind to the session's knex
+            });
     }
 };
