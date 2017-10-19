@@ -1,4 +1,7 @@
 # schwifty-migration
+An [Objection.js](https://github.com/Vincit/objection.js) model migration tool for use during development
+
+[![Build Status](https://travis-ci.org/BigRoomStudios/schwifty-migration.svg?branch=master)](https://travis-ci.org/BigRoomStudios/schwifty-migration) [![Coverage Status](https://coveralls.io/repos/github/BigRoomStudios/schwifty-migration/badge.svg?branch=master)](https://coveralls.io/github/BigRoomStudios/schwifty-migration?branch=master)
 
 ## Getting Started
 - Run `npm install`
