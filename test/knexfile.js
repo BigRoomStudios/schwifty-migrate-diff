@@ -14,8 +14,7 @@ module.exports = [
         client: 'mysql',
         connection: {
             host: '127.0.0.1',
-            user: 'schwifty_migration',
-            password: 'schwifty_migration_test',
+            user: 'root',
             database: 'schwifty_migration_test'
         },
         pool: {
@@ -33,8 +32,7 @@ module.exports = [
         client: 'postgres',
         connection: {
             host: '127.0.0.1',
-            user: 'schwifty_migration',
-            password: 'schwifty_migration_test',
+            user: 'postgres',
             database: 'schwifty_migration_test'
         }
     }

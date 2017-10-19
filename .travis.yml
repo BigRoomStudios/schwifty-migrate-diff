@@ -6,4 +6,16 @@ node_js:
   - "7"
   - "8"
 
+services:
+  - postgresql
+  - mysql
+
+env:
+  - DB=postgresql
+  - DB=mysql
+
+before_script:
+  - psql -U postgres -c 'CREATE DATABASE schwifty_migration_test;'
+  - mysql -e 'CREATE DATABASE schwifty_migration_test'
+
 after_script: "npm run coveralls"
