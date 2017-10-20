@@ -95,9 +95,8 @@ const testUtils = {
     setOptionsForAfter
 };
 
-// const testDbs = ['sqlite3', 'mysql', 'postgres'];
-// const testDbs = ['postgres', 'mysql'];
-const testDbs = ['postgres'];
+const envDB = process.env.DB;
+const testDbs = (envDB && [envDB]) || ['postgres'];
 
 describe('SchwiftyMigration', () => {
 
