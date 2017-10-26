@@ -33,7 +33,7 @@ Ex.
 ```diff
 $base: {
     migrateOnStart: true,
-+    migrationsMode: process.env.MIGRATE,
++   migrationsMode: process.env.MIGRATE,
     knex: {
         client: 'sqlite3',
         useNullAsDefault: true,
