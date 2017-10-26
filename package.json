@@ -1,61 +1,61 @@
 {
-  "name": "schwifty-migration",
-  "version": "0.0.1",
-  "description": "A hapi plugin to aid migration for schwifty models",
-  "main": "lib/index.js",
-  "scripts": {
-    "test": "lab -a code -t 100 -L -I '__core-js_shared__'",
-    "test:html": "lab -a code -t 100 -r html -o test.html -L -I '__core-js_shared__'",
-    "lint": "eslint .",
-    "coveralls": "lab -r lcov | coveralls"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BigRoomStudios/schwifty-migration.git"
-  },
-  "engines": {
-    "node": ">=4.0.0"
-  },
-  "keywords": [
-    "hapi",
-    "plugin",
-    "objection",
-    "database",
-    "migration",
-    "orm",
-    "schwifty"
-  ],
-  "author": "William Woodruff <bill@bigroomstudios.com>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/BigRoomStudios/schwifty-migration/issues"
-  },
-  "homepage": "https://github.com/BigRoomStudios/schwifty-migration#readme",
-  "dependencies": {
-    "chalk": "^1.1.3",
-    "handlebars": "^4.0.8",
-    "inquirer": "^2.0.0",
-    "items": "^2.1.1",
-    "joi": "^13.0.1",
-    "jsondiffpatch": "^0.2.4",
-    "knex": "^0.13.0",
-    "toys": "^1.0.0"
-  },
-  "peerDependencies": {
-    "hapi": ">=10 <17"
-  },
-  "devDependencies": {
-    "bluebird": "^3.5.0",
-    "code": "4.x.x",
-    "coveralls": "^2.11.15",
-    "eslint": "^3.12.2",
-    "glue": "^4.1.0",
-    "hapi": "^16.1.0",
-    "lab": "^14.3.1",
-    "lodash": "^4.17.4",
-    "mysql": "^2.13.0",
-    "objection": "^0.8.9",
-    "pg": "^6.2.2",
-    "schwifty": "^2.0.0"
-  }
+    "name": "schwifty-migration",
+    "version": "0.0.1",
+    "description": "A hapi plugin to aid migration for schwifty models",
+    "main": "lib/index.js",
+    "scripts": {
+        "test": "lab -a code -t 100 -L -I '__core-js_shared__'",
+        "test:html": "lab -a code -t 100 -r html -o test.html -L -I '__core-js_shared__'",
+        "lint": "eslint .",
+        "coveralls": "lab -r lcov | coveralls"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/BigRoomStudios/schwifty-migration.git"
+    },
+    "engines": {
+        "node": ">=4.0.0"
+    },
+    "keywords": [
+        "hapi",
+        "plugin",
+        "objection",
+        "database",
+        "migration",
+        "orm",
+        "schwifty"
+    ],
+    "author": "William Woodruff <bill@bigroomstudios.com>",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/BigRoomStudios/schwifty-migration/issues"
+    },
+    "homepage": "https://github.com/BigRoomStudios/schwifty-migration#readme",
+    "dependencies": {
+        "chalk": "^1.1.3",
+        "handlebars": "^4.0.8",
+        "inquirer": "^2.0.0",
+        "items": "^2.1.1",
+        "joi": "^13.0.1",
+        "jsondiffpatch": "^0.2.4",
+        "knex": "^0.13.0",
+        "toys": "^1.0.0"
+    },
+    "peerDependencies": {
+        "hapi": ">=10 <17"
+    },
+    "devDependencies": {
+        "bluebird": "^3.5.0",
+        "code": "4.x.x",
+        "coveralls": "^2.11.15",
+        "eslint": "^3.12.2",
+        "glue": "^4.1.0",
+        "hapi": "^16.1.0",
+        "lab": "^14.3.1",
+        "lodash": "^4.17.4",
+        "mysql": "^2.13.0",
+        "objection": "^0.8.9",
+        "pg": "^6.2.2",
+        "schwifty": "^2.0.0"
+    }
 }

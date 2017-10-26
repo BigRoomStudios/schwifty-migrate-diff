@@ -10,7 +10,7 @@ services:
   - mysql
 
 env:
-  - DB=postgresql
+  - DB=postgres
   - DB=mysql
 
 before_script:
