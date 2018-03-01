@@ -16,7 +16,7 @@ npm install git+https://github.com/BigRoomStudios/schwifty-migration.git
 ```
 ---
 
-- Create an npm 'migrate' script so that schwifty's `migrationsMode` plugin option is set to either 'create' or 'alter'.
+- Create an npm 'migrate' script so that schwifty's `mode` plugin option is set to either 'create' or 'alter'.
 
 Ex.
 ```
