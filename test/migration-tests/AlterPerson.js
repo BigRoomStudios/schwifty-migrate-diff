@@ -28,7 +28,7 @@ module.exports = class AlterPerson extends Model {
                 zipCode: Joi.string()
             }),
 
-            hometown: Joi.string() // This will be ignored
+            hometown: Joi.string() // This will be the only thing reflected in the migration file
         });
     }
 };
