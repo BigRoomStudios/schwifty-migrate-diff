@@ -164,7 +164,7 @@ describe('SchwiftyMigration', () => {
             models: [],
             migrationsDir: 'some/path',
             knex: class MyKnex {},
-            mode: 'test'
+            mode: 'alter'
         }, (err) => {
 
             expect(err).to.not.exist();
@@ -183,7 +183,7 @@ describe('SchwiftyMigration', () => {
             models: [require('./migration-tests/Dog')],
             migrationsDir: absolutePath,
             knex: session.knex,
-            mode: 'test'
+            mode: 'alter'
         }, (err) => {
 
             expect(err).to.not.exist();
@@ -192,7 +192,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/Dog')],
                 migrationsDir: relativePath,
                 knex: session.knex,
-                mode: 'test'
+                mode: 'alter'
             }, (err) => {
 
                 expect(err).to.not.exist();
@@ -226,7 +226,7 @@ describe('SchwiftyMigration', () => {
                     models: [require('./migration-tests/Person')],
                     migrationsDir,
                     knex: session.knex,
-                    mode: 'create'
+                    mode: 'alter'
                 }, (err) => {
 
                     expect(err).to.not.exist();
@@ -247,7 +247,47 @@ describe('SchwiftyMigration', () => {
             });
     });
 
-    it('Prints to the console on successful migration', (done) => {
+    it('Suppresses alter and drop actions if mode is not set to "alter"', (done) => {
+
+        const session = initSessions[0];
+        const migrationsDir = './test/migration-tests/migrations';
+        const seedPath = './test/migration-tests/seed';
+
+        testUtils.setOptionsForAfter(session, seedPath);
+
+        session.knex.migrate.latest({
+            directory: seedPath
+        })
+            .then(() => {
+
+                SchwiftyMigration.genMigrationFile({
+                    models: [require('./migration-tests/AlterPerson')],
+                    migrationsDir,
+                    knex: session.knex,
+                    mode: 'create'
+                }, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    const expectedMigrationPath = './test/migration-tests/mode-enforcement/create-mode/expected-migration.js';
+                    const actualMigrationContents = testUtils.utils.getLatestMigration(migrationsDir);
+                    const expectedMigrationContents = Fs.readFileSync(expectedMigrationPath).toString('utf8');
+
+                    expect(actualMigrationContents).to.equal(expectedMigrationContents);
+
+                    Fs.readdirSync(migrationsDir)
+                        .forEach((migrationFile) => {
+
+                            const filePath = Path.join(migrationsDir, migrationFile);
+                            Fs.unlinkSync(filePath);
+                        });
+
+                    done();
+                });
+            });
+    });
+
+    it('Prints to the console on successful migration file generation', (done) => {
 
         const session = initSessions[0];
         const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
@@ -256,7 +296,7 @@ describe('SchwiftyMigration', () => {
             models: [require('./migration-tests/Dog')],
             migrationsDir: absolutePath,
             knex: session.knex,
-            mode: 'create'
+            mode: 'alter'
         }, (err) => {
 
             expect(err).to.not.exist();
@@ -276,7 +316,7 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors on unsupported Joi schema', (done) => {
+    it('throws on unsupported Joi schema', (done) => {
 
         const session = initSessions[0];
         const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
@@ -287,7 +327,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/BadPerson')],
                 migrationsDir: absolutePath,
                 knex: session.knex,
-                mode: 'create'
+                mode: 'alter'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -297,7 +337,6 @@ describe('SchwiftyMigration', () => {
 
         done();
     });
-
 
     it('creates new tables and columns', (done) => {
 

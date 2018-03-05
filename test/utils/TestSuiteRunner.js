@@ -93,7 +93,7 @@ module.exports = class TestRunner {
                                 models: testModels,
                                 migrationsDir,
                                 knex: session.knex,
-                                mode: 'test',
+                                mode: 'alter',
                                 migrationName: `it-${itText.split(' ').join('-')}`
                             }, (err) => {
 
