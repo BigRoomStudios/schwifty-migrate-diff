@@ -18,7 +18,7 @@ module.exports = class AlterPerson extends Model {
         return Joi.object({
             id: Joi.number().integer(),
             firstName: Joi.number(), // It's the future, all firstNames are numbers now // This will be ignored
-            lastName: Joi.string(),
+            // lastName: Joi.string(), // This will be ignored
 
             age: Joi.number().integer(),
 

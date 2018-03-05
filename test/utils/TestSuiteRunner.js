@@ -113,6 +113,9 @@ module.exports = class TestRunner {
                                     console.error(`Problem with "${itText}"`);
                                     console.error('');
                                 }
+                                else {
+                                    process.stdout.write('.');
+                                }
 
                                 expect(actualMigrationContents).to.equal(expectedMigrationContents);
 
