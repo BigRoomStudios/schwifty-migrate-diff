@@ -1,4 +1,7 @@
-
-node_modules/
+node_modules/*
+.tmp/
+npm-debug*
+package-lock.json
 .DS_Store
+
 test/migration-tests/**/migrations/**/*.js

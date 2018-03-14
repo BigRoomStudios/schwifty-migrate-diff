@@ -1,6 +1,6 @@
 {
     "name": "schwifty-migration",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "A hapi plugin to aid migration for schwifty models",
     "main": "lib/index.js",
     "scripts": {
