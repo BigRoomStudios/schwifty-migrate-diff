@@ -20,17 +20,6 @@ const Utils = require('./utils');
 
 const internals = {};
 
-// Mutate console.log to keep SchwiftyMigration from printing to the console
-
-console._log = console.log;
-
-let logOutput = [];
-
-console.log = (...args) => {
-
-    logOutput.push(...args);
-};
-
 const rollbackDb = (session, rollbackPath, next) => {
 
     const { knex } = session;
@@ -69,15 +58,11 @@ lab.afterEach((done) => {
         rollbackDb(sessionForAfter, rollbackPath, () => {
 
             internals.sessionForAfter = undefined;
-            // Reset state for console log
-            logOutput = [];
             done();
         });
     }
     else {
         internals.sessionForAfter = undefined;
-        // Reset state for console log
-        logOutput = [];
         done();
     }
 });
@@ -227,13 +212,10 @@ describe('SchwiftyMigration', () => {
                     migrationsDir,
                     knex: session.knex,
                     mode: 'alter'
-                }, (err) => {
+                }, (err, output) => {
 
                     expect(err).to.not.exist();
-
-                    expect(logOutput[0].includes('//////////////')).to.equal(true);
-                    expect(logOutput[1].includes('Models up to date')).to.equal(true);
-                    expect(logOutput[2].includes('No migration needed')).to.equal(true);
+                    expect(output).to.equal('No migration needed');
 
                     Fs.readdirSync(migrationsDir)
                         .forEach((migrationFile) => {
@@ -297,13 +279,11 @@ describe('SchwiftyMigration', () => {
             migrationsDir: absolutePath,
             knex: session.knex,
             mode: 'alter'
-        }, (err) => {
+        }, (err, output) => {
 
             expect(err).to.not.exist();
 
-            expect(logOutput[0].includes('//////////////')).to.equal(true);
-            expect(logOutput[1].includes('Success!')).to.equal(true);
-            expect(logOutput[2].includes('Generated new migration file:')).to.equal(true);
+            expect(output.includes('_schwifty-migration.js')).to.equal(true);
 
             Fs.readdirSync(absolutePath)
                 .forEach((migrationFile) => {
