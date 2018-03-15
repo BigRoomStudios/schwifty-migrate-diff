@@ -98,9 +98,6 @@ module.exports = class TestRunner {
                             }, (err) => {
 
                                 if (err) {
-                                    if (Array.isArray(err)) {
-                                        return done(new Error(`Multiple errors: "${err}"`));
-                                    }
                                     return done(err);
                                 }
 
@@ -113,20 +110,54 @@ module.exports = class TestRunner {
                                     console.error(`Problem with "${itText}"`);
                                     console.error('');
                                 }
-                                else {
-                                    process.stdout.write('.');
-                                }
 
+                                // Ensure the migration matches expected
                                 expect(actualMigrationContents).to.equal(expectedMigrationContents);
 
-                                done();
+                                // Now run the just created migration to make sure the code is valid!
+
+                                if (seedMigration) {
+                                    const seedFileName = Fs.readdirSync(seedPath)[0];
+                                    const seedFilePath = Path.resolve(seedPath, seedFileName);
+                                    const seedContents = Fs.readFileSync(seedFilePath).toString('utf8');
+
+                                    // Copy the seed file into the migration dir then run the migration
+                                    Fs.writeFileSync(Path.join(migrationsDir, seedFileName), seedContents);
+                                }
+
+                                // Let's migrate our generated file and then
+                                // run genMigrationFile again, expecting to see
+                                // 'No migration needed'
+
+                                this.testUtils.setOptionsForAfter(session, migrationsDir);
+
+                                session.knex.migrate.latest({
+                                    directory: migrationsDir
+                                })
+                                    .then((...args) => {
+
+                                        SchwiftyMigration.genMigrationFile({
+                                            models: testModels,
+                                            migrationsDir,
+                                            knex: session.knex,
+                                            mode: 'alter'
+                                        }, (err, output) => {
+
+                                            if (err) {
+                                                return done(err);
+                                            }
+
+                                            expect(output).to.equal('No migration needed');
+                                            process.stdout.write('.');
+                                            done();
+                                        });
+                                    });
                             });
                         };
 
                         if (seedMigration) {
 
                             // This is a func in test/index.js
-                            this.testUtils.setOptionsForAfter(session, seedPath);
 
                             session.knex.migrate.latest({
                                 directory: seedPath

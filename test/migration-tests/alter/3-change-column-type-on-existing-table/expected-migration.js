@@ -5,7 +5,7 @@ exports.up = (knex, Promise) => {
     return knex.schema
         .alterTable('Person', (table) => {
             table.boolean('firstName').alter();
-            table.number('lastName').alter();
+            table.float('lastName').alter();
         })
 
 };
