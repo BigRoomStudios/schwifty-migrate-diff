@@ -147,6 +147,8 @@ module.exports = class TestRunner {
                                                 return done(err);
                                             }
 
+                                            console.log('output', output);
+
                                             expect(output).to.equal('No migration needed');
                                             process.stdout.write('.');
                                             done();
