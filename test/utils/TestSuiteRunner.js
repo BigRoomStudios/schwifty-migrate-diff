@@ -147,15 +147,6 @@ module.exports = class TestRunner {
                                                 return done(err);
                                             }
 
-                                            console.log('output', output);
-                                            if (output !== 'No migration needed') {
-                                                const fileNames = Fs.readdirSync(migrationsDir);
-                                                const name = fileNames[fileNames.length - 1];
-                                                const filePath = Path.resolve(migrationsDir, name);
-                                                const contents = Fs.readFileSync(filePath).toString('utf8');
-                                                console.log('contents', contents);
-                                            }
-
                                             expect(output).to.equal('No migration needed');
                                             process.stdout.write('.');
                                             done();
