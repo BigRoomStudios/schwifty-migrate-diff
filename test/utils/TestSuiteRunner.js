@@ -95,7 +95,7 @@ module.exports = class TestRunner {
                                 knex: session.knex,
                                 mode: 'alter',
                                 migrationName: `it-${itText.split(' ').join('-')}`
-                            }, (err) => {
+                            }, (err, output) => {
 
                                 if (err) {
                                     return done(err);
@@ -141,15 +141,46 @@ module.exports = class TestRunner {
                                             migrationsDir,
                                             knex: session.knex,
                                             mode: 'alter'
-                                        }, (err, output) => {
+                                        }, (err, noMigrationNeededOutput) => {
 
                                             if (err) {
                                                 return done(err);
                                             }
 
-                                            expect(output).to.equal('No migration needed');
-                                            process.stdout.write('.');
-                                            done();
+                                            expect(noMigrationNeededOutput).to.equal('No migration needed');
+
+                                            // Finally, we'll test the rollback code
+                                            // let's rollback this migration,
+                                            // generate a new migration file,
+                                            // then ensure the contents are what we expect
+
+                                            utils.rollbackDbOnce(session, migrationsDir, (err) => {
+
+                                                // We should be all rolled back now
+                                                expect(err).to.not.exist();
+
+                                                // Delete the migration file (leave seed file(s))
+
+                                                Fs.unlinkSync(output);
+
+                                                SchwiftyMigration.genMigrationFile({
+                                                    models: testModels,
+                                                    migrationsDir,
+                                                    knex: session.knex,
+                                                    mode: 'alter',
+                                                    migrationName: 'after-rollback'
+                                                }, (err, afterRollbackOutput) => {
+
+                                                    if (err) {
+                                                        return done(err);
+                                                    }
+
+                                                    expect(Fs.readFileSync(afterRollbackOutput).toString('utf8')).to.equal(expectedMigrationContents);
+
+                                                    process.stdout.write('.');
+                                                    done();
+                                                });
+                                            });
                                         });
                                     });
                             });
