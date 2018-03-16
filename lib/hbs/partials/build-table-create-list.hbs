@@ -4,7 +4,7 @@
             {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
             table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
             {{/each}}
-        }){{tableMaybeSemi 'create' this @root.tableDeltas ../tableType}}
+        }){{tableMaybeSemi 'create' this @root.tableDeltas @root.columnDeltas ../tableType}}
     {{/each}}
     {{#each tableDelta.alter}}
     knex.schema.renameTable('{{this}}').
