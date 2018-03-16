@@ -2,6 +2,7 @@
 {{#if (itemNotInArray this.model @root.createdTables)}}
 {{#if (someObjectPropsHaveValue this)}}
         .alterTable('{{this.model}}', (table) => {
+
             {{#each this.create}}
             table.dropColumn('{{this}}');
             {{/each}}
@@ -11,7 +12,7 @@
             {{#each this.drop}}
             table.{{this.columnType}}('{{this.columnName}}');
             {{/each}}
-        })
+        }){{columnMaybeSemi 'alter' this @root.columnDeltas}}
 {{/if}}
 {{/if}}
 {{/each}}

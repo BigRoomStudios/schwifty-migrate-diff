@@ -87,7 +87,8 @@ class TestSession {
             knex.schema.dropTableIfExists('Movie'),
             knex.schema.dropTableIfExists('Person_Movie'),
             knex.schema.dropTableIfExists('Person'),
-            knex.schema.dropTableIfExists('Zombie')
+            knex.schema.dropTableIfExists('Zombie'),
+            knex('knex_migrations').del()
         ])
             .asCallback((err) => {
 

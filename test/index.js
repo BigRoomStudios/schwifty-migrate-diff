@@ -46,8 +46,7 @@ const rollbackDb = (session, rollbackPath, next) => {
 
 lab.afterEach((done) => {
 
-    // setOptionsForAfter() sets these, and setOptionsForAfter()
-    // gets called in the TestRunner
+    // Just brute clear out the db
 
     const { sessionForAfter, rollbackPath } = internals;
 
