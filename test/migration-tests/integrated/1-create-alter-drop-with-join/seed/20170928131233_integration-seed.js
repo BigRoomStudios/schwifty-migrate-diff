@@ -14,6 +14,11 @@ exports.up = function (knex, Promise) {
             table.integer('id');
             table.string('title');
             table.string('subTitle');
+        })
+        .createTableIfNotExists('Dog_Movie', (table) => {
+
+            table.integer('dogId');
+            table.integer('movieId');
         });
 
 };

@@ -14,7 +14,7 @@ module.exports = class Person extends Model {
 
         return Joi.object({
             id: Joi.number().integer(),
-            firstName: Joi.string(),
+            firstName: Joi.number(),
 
             age: Joi.number().integer(),
 

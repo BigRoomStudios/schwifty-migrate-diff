@@ -29,8 +29,8 @@ module.exports = class Movie extends Model {
                     from: 'Person.id',
                     through: {
                         from: 'Person_Movie.personId',
-                        extra: ['one-extra', 'two-extra'],
-                        to: 'Person_Movie.movieId'
+                        to: 'Person_Movie.movieId',
+                        extra: ['one-extra', 'two-extra']
                     },
                     to: 'Movie.id'
                 }

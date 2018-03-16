@@ -15,10 +15,18 @@ exports.up = (knex, Promise) => {
             table.string('personId');
             table.string('movieId');
         })
+        .createTableIfNotExists('Dog_Movie', (table) => {
+
+            table.string('one-extra');
+            table.string('two-extra');
+            table.string('dogId');
+            table.string('movieId');
+        })
         .alterTable('Person', (table) => {
 
             table.integer('age');
             table.json('address');
+            table.float('firstName').alter();
             table.dropColumn('lastName');
         });
 
@@ -29,10 +37,12 @@ exports.down = (knex, Promise) => {
     return knex.schema
         .dropTable('Dog')
         .dropTable('Person_Movie')
+        .dropTable('Dog_Movie')
         .alterTable('Person', (table) => {
 
             table.dropColumn('age');
             table.dropColumn('address');
+            table.string('firstName').alter();
             table.string('lastName');
         });
 
