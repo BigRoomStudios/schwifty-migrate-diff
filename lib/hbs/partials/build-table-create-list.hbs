@@ -1,13 +1,14 @@
     {{#each (keyFromObject 'create' (keyFromObject tableType @root.tableDeltas))}}
         .createTableIfNotExists('{{this}}', (table) => {
+
             {{#each (objectKeys (keyFromObject 'knexSchema' (keyFromObject this @root.allTables)))}}
             table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this @root.allTables))}}('{{this}}');
             {{/each}}
-        })
-    {{/each}}
-    {{#each tableDelta.drop}}
-    knex.schema.dropTable('{{this}}'),
+        }){{tableMaybeSemi 'create' this @root.tableDeltas @root.columnDeltas ../tableType}}
     {{/each}}
     {{#each tableDelta.alter}}
     knex.schema.renameTable('{{this}}').
+    {{/each}}
+    {{#each tableDelta.drop}}
+    knex.schema.dropTable('{{this}}').
     {{/each}}

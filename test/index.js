@@ -20,34 +20,9 @@ const Utils = require('./utils');
 
 const internals = {};
 
-const rollbackDb = (session, rollbackPath, next) => {
-
-    const { knex } = session;
-    const config = Object.assign(
-        {},
-        session.options.knexConfig,
-        { directory: rollbackPath }
-    );
-
-    knex.migrate.currentVersion()
-        .then((cv) => {
-
-            if (cv !== 'none') {
-                return knex.migrate.rollback(config)
-                    .then(() => {
-
-                        rollbackDb(session, rollbackPath, next);
-                    })
-                    .catch(next);
-            }
-            next();
-        });
-};
-
 lab.afterEach((done) => {
 
-    // setOptionsForAfter() sets these, and setOptionsForAfter()
-    // gets called in the TestRunner
+    // Just brute clear out the db
 
     const { sessionForAfter, rollbackPath } = internals;
 
@@ -55,7 +30,7 @@ lab.afterEach((done) => {
 
         // Wipe the db!
 
-        rollbackDb(sessionForAfter, rollbackPath, () => {
+        Utils.rollbackDb(sessionForAfter, rollbackPath, () => {
 
             internals.sessionForAfter = undefined;
             done();
@@ -313,7 +288,7 @@ describe('SchwiftyMigration', () => {
                 expect(err).to.exist();
                 done();
             });
-        }).to.throw('Joi Schema type(s) \"alternatives\" not supported.');
+        }).to.throw('Joi Schema type(s) \"alternatives\" not supported. Please fix mappings.js');
 
         done();
     });
@@ -336,6 +311,18 @@ describe('SchwiftyMigration', () => {
 
             // Run migration tests for `alter`
             const createRunner = new TestSuiteRunner('alter', session, testUtils);
+            createRunner.genTests();
+        });
+
+        done();
+    });
+
+    it('integration testing', (done) => {
+
+        initSessions.forEach((session) => {
+
+            // Run migration tests for `alter`
+            const createRunner = new TestSuiteRunner('integrated', session, testUtils);
             createRunner.genTests();
         });
 

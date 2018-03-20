@@ -29,7 +29,19 @@ module.exports = class Movie extends Model {
                     from: 'Person.id',
                     through: {
                         from: 'Person_Movie.personId',
-                        to: 'Person_Movie.movieId',
+                        to: 'Person_Movie.movieId'
+                    },
+                    to: 'Movie.id'
+                }
+            },
+            dogActors: {
+                relation: Model.ManyToManyRelation,
+                modelClass: require('./Dog'),
+                join: {
+                    from: 'Dog.id',
+                    through: {
+                        from: 'Dog_Movie.dogId',
+                        to: 'Dog_Movie.movieId',
                         extra: ['one-extra', 'two-extra']
                     },
                     to: 'Movie.id'
