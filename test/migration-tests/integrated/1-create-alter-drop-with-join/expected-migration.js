@@ -26,6 +26,7 @@ exports.up = (knex, Promise) => {
 
             table.string('one-extra');
             table.string('two-extra');
+            table.integer('movieId').alter();
         });
 
 };
@@ -46,6 +47,7 @@ exports.down = (knex, Promise) => {
 
             table.dropColumn('one-extra');
             table.dropColumn('two-extra');
+            table.string('movieId').alter();
         });
 
 };

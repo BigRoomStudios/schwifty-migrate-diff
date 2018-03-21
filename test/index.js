@@ -169,7 +169,7 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('Prints to the console on no migration (no-op)', (done) => {
+    it('Returns "No migration needed" when the db and models are in sync (no-op)', (done) => {
 
         const session = initSessions[0];
         const migrationsDir = './test/migration-tests/migrations';

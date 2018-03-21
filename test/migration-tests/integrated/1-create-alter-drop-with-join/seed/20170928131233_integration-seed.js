@@ -18,7 +18,8 @@ exports.up = function (knex, Promise) {
         .createTableIfNotExists('Dog_Movie', (table) => {
 
             table.integer('dogId');
-            table.integer('movieId');
+            table.string('movieId');
+            table.integer('seeded-extra');
         });
 
 };

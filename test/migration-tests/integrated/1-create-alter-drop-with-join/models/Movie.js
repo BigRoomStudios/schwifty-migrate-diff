@@ -42,7 +42,7 @@ module.exports = class Movie extends Model {
                     through: {
                         from: 'Dog_Movie.dogId',
                         to: 'Dog_Movie.movieId',
-                        extra: ['one-extra', 'two-extra']
+                        extra: ['one-extra', 'two-extra', 'seeded-extra']
                     },
                     to: 'Movie.id'
                 }
