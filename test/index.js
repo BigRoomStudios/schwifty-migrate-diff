@@ -125,9 +125,10 @@ describe('SchwiftyMigration', () => {
             migrationsDir: 'some/path',
             knex: class MyKnex {},
             mode: 'alter'
-        }, (err) => {
+        }, (err, output) => {
 
             expect(err).to.not.exist();
+            expect(output).to.equal('No models passed');
             done();
         });
     });
