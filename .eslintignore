@@ -1,9 +1,8 @@
 node_modules/*
 
-/* If you remove this next line, the tests will fail with
- * a really strange side-effect. Generated migration files
- * will have different timestamp than what's in the db
- * The result will be Fs can't open a file because it has the wrong filename
- */
+# If you remove this next line, the tests will fail with
+# a really strange side-effect. Generated migration files
+# will have different timestamp than what's in the db
+# The result will be Fs can't open a file because it has the wrong filename
 
 test/migration-tests/**/migrations/
