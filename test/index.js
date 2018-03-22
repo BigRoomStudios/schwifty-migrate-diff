@@ -10,6 +10,7 @@ const KnexConfigs = require('./knexfile');
 const TestSession = require('./utils/TestSession');
 const TestSuiteRunner = require('./utils/TestSuiteRunner');
 const SchwiftyMigration = require('../lib');
+const Knex = require('knex');
 
 // Test shortcuts
 
@@ -103,27 +104,51 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('throws if you give bad options', (done) => {
+    it('errors if you give bad options', (done) => {
 
-        expect(() => {
+        SchwiftyMigration.genMigrationFile({
+            invalid: 'options!'
+        }, (err) => {
 
-            SchwiftyMigration.genMigrationFile({
-                invalid: 'options!'
-            });
-        }).to.throw(/Bad options passed to schwifty-migration/);
+            expect(err).to.exist();
+            expect(err.message).to.equal('Bad options passed to schwifty-migration: child \"migrationsDir\" fails because [\"migrationsDir\" is required]');
+            done();
+        });
+    });
 
-        done();
+    it('errors on a knex that isn\'t pingable', (done) => {
+
+        const badKnex = Knex({
+            client: 'postgres',
+            connection: {
+                host: '1.2.3.4.5',
+                user: 'postgres',
+                password: 'postgres',
+                database: 'schwifty_migration_test'
+            }
+        });
+
+        SchwiftyMigration.genMigrationFile({
+            models: [require('./migration-tests/Dog')],
+            migrationsDir: 'some/path',
+            knex: badKnex,
+            mode: 'alter'
+        }, (err) => {
+
+            expect(err).to.exist();
+            expect(err.message).to.equal('getaddrinfo ENOTFOUND 1.2.3.4.5 1.2.3.4.5:5432');
+            done();
+        });
     });
 
     it('returns early if models are empty', (done) => {
 
-        // This returns early enough that the other options aren't
-        // used, so bogus ones can be passed here
+        const session = initSessions[0];
 
         SchwiftyMigration.genMigrationFile({
             models: [],
             migrationsDir: 'some/path',
-            knex: class MyKnex {},
+            knex: session.knex,
             mode: 'alter'
         }, (err, output) => {
 
@@ -272,26 +297,22 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('throws on unsupported Joi schema', (done) => {
+    it('errors on unsupported Joi schema in model', (done) => {
 
         const session = initSessions[0];
         const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
-        expect(() => {
+        SchwiftyMigration.genMigrationFile({
+            models: [require('./migration-tests/BadPerson')],
+            migrationsDir: absolutePath,
+            knex: session.knex,
+            mode: 'alter'
+        }, (err) => {
 
-            SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/BadPerson')],
-                migrationsDir: absolutePath,
-                knex: session.knex,
-                mode: 'alter'
-            }, (err) => {
-
-                expect(err).to.exist();
-                done();
-            });
-        }).to.throw('Joi Schema type(s) \"alternatives\" not supported. Please fix mappings.js');
-
-        done();
+            expect(err).to.exist();
+            expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported. Please fix mappings.js');
+            done();
+        });
     });
 
     it('creates new tables and columns', (done) => {
