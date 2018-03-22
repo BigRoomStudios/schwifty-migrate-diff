@@ -310,7 +310,7 @@ describe('SchwiftyMigration', () => {
         }, (err) => {
 
             expect(err).to.exist();
-            expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported. Please fix mappings.js');
+            expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported.');
             done();
         });
     });
