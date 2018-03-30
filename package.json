@@ -45,7 +45,7 @@
         "hapi": ">=10 <17"
     },
     "devDependencies": {
-        "bluebird": "^3.5.0",
+        "bluebird": "^3.5.1",
         "code": "4.x.x",
         "coveralls": "^2.11.15",
         "eslint": "^3.12.2",

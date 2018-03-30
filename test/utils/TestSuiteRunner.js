@@ -42,11 +42,12 @@ module.exports = class TestRunner {
             console.log('Tests filtered to run:', filteredTests);
         };
 
-        describe(`"${this.session.options.knexConfig.client} ${this.testType}" tests:`, () => {
+        const rootSession = this.session;
+
+        describe(`"${rootSession.options.knexConfig.client} ${this.testType}" tests:`, () => {
 
             filteredTests.forEach((testName) => {
 
-                const rootSession = this.session;
                 const testPath = Path.join(this.testSuitePath, testName);
                 const itText = require(Path.join(testPath, 'it'));
                 const seedPath = Path.join(testPath, 'seed');
@@ -74,7 +75,7 @@ module.exports = class TestRunner {
                     // Clone a new session for each test
                     // This also wipes the db for a fresh start =)
 
-                    const session = TestSession.cloneSession(this.session, () => {
+                    const session = TestSession.cloneSession(rootSession, () => {
 
                         const dbInitialized = () => {
 

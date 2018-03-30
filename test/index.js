@@ -10,24 +10,21 @@ const KnexConfigs = require('./knexfile');
 const TestSession = require('./utils/TestSession');
 const TestSuiteRunner = require('./utils/TestSuiteRunner');
 const SchwiftyMigration = require('../lib');
-const Knex = require('knex');
 
 // Test shortcuts
 
 const lab = exports.lab = Lab.script({ schedule: false });
 const expect = Code.expect;
-const { describe, it, before } = lab;
+const { describe, it, afterEach } = lab;
 const Utils = require('./utils');
 
 const internals = {};
 
-lab.afterEach((done) => {
-
-    // Just brute clear out the db
+afterEach((done) => {
 
     const { sessionForAfter, rollbackPath } = internals;
 
-    if (sessionForAfter) {
+    if (rollbackPath) {
 
         // Wipe the db!
 
@@ -39,7 +36,17 @@ lab.afterEach((done) => {
     }
     else {
         internals.sessionForAfter = undefined;
-        done();
+        internals.rollbackPath = undefined;
+
+        if (!sessionForAfter) {
+            return done();
+        }
+
+        sessionForAfter.knex.destroy()
+            .asCallback((err) => {
+
+                done(err);
+            });
     }
 });
 
@@ -57,52 +64,44 @@ const testUtils = {
 };
 
 const envDB = process.env.DB;
-const testDbs = (envDB && [envDB]) || ['postgres'];
+const testDb = envDB || 'postgres';
+
+const knexConfig = KnexConfigs.find((conf) => conf.client === testDb);
+
+if (!knexConfig) {
+    throw new Error(`Unsupported db "${testDb}"`);
+}
 
 describe('SchwiftyMigration', () => {
 
-    let initSessions = [];
+    const makeSession = (cb) => {
 
-    const getSessions = () => {
+        const session = new TestSession({ options: { knexConfig } },
+            (err) => {
 
-        const sessions = [];
-
-        const promises = KnexConfigs.filter((knexConfig) => {
-
-            // Only test the dbs specified in the `testDbs` array
-            return testDbs.indexOf(knexConfig.client) !== -1;
-        })
-            .map((knexConfig) => {
-
-                return new Promise((resolve, reject) => {
-
-                    // Create all the test sessions
-
-                    sessions.push(new TestSession({
-                        options: { knexConfig },
-                        next: () => {
-
-                            resolve(...sessions);
-                        }
-                    }));
-                });
+                setOptionsForAfter(session);
+                cb(err, session);
             });
-
-        return Promise.all(promises);
     };
 
-    before({ timeout: 10000 }, () => {
+    const failKnexWith = (knex, toErrorOn, errMsg) => {
 
-        return new Promise((resolve, reject) => {
+        // Grabbed this technique from https://github.com/tgriesser/knex/blob/2e1a459a9e740f24b9a4647bd4da427854e551dd/test/integration/logger.js#L89-L108
 
-            getSessions()
-                .then((args) => {
+        const originalQb = knex.queryBuilder;
+        knex.queryBuilder = (...args) => {
 
-                    initSessions = args;
-                    resolve(args);
-                });
-        });
-    });
+            const qb = originalQb.apply(this, arguments);
+
+            qb[toErrorOn] = () => {
+
+                return Promise.reject(new Error(errMsg));
+            };
+            return qb;
+        };
+
+        return knex;
+    };
 
     it('errors if you give bad options', (done) => {
 
@@ -118,70 +117,201 @@ describe('SchwiftyMigration', () => {
 
     it('errors on a knex that isn\'t pingable', (done) => {
 
-        const badKnex = Knex({
-            client: 'postgres',
-            connection: {
-                host: '1.2.3.4.5',
-                user: 'postgres',
-                password: 'postgres',
-                database: 'schwifty_migration_test'
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
             }
-        });
 
-        SchwiftyMigration.genMigrationFile({
-            models: [require('./migration-tests/Dog')],
-            migrationsDir: 'some/path',
-            knex: badKnex,
-            mode: 'alter'
-        }, (err) => {
+            const badKnex = failKnexWith(session.knex, 'select', 'Not pingable');
 
-            expect(err).to.exist();
-            expect(err.message).to.equal('getaddrinfo ENOTFOUND 1.2.3.4.5 1.2.3.4.5:5432');
-            done();
+            SchwiftyMigration.genMigrationFile({
+                models: [require('./migration-tests/Dog')],
+                migrationsDir: 'some/path',
+                knex: badKnex,
+                mode: 'alter'
+            }, (err) => {
+
+                expect(err).to.exist();
+                expect(err.message).to.equal('Not pingable');
+
+                done();
+            });
         });
     });
 
-    it('returns early if models are empty', (done) => {
+    it('Errors if "No models passed"', (done) => {
 
-        const session = initSessions[0];
+        makeSession((err, session) => {
 
-        SchwiftyMigration.genMigrationFile({
-            models: [],
-            migrationsDir: 'some/path',
-            knex: session.knex,
-            mode: 'alter'
-        }, (err, output) => {
+            if (err) {
+                return done(err);
+            }
 
-            expect(err).to.not.exist();
-            expect(output).to.equal('No models passed');
-            done();
+            SchwiftyMigration.genMigrationFile({
+                models: [],
+                migrationsDir: 'some/path',
+                knex: session.knex,
+                mode: 'alter'
+            }, (err) => {
+
+                expect(err).to.exist();
+                expect(err.message).to.equal('No models passed');
+
+                done();
+            });
         });
     });
 
     it('accepts absolute and relative migration file paths', (done) => {
 
-        const session = initSessions[0];
+        makeSession((err, session) => {
 
-        const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
-        const relativePath = './test/migration-tests/migrations';
+            if (err) {
+                return done(err);
+            }
 
-        SchwiftyMigration.genMigrationFile({
-            models: [require('./migration-tests/Dog')],
-            migrationsDir: absolutePath,
-            knex: session.knex,
-            mode: 'alter'
-        }, (err) => {
-
-            expect(err).to.not.exist();
+            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+            const relativePath = './test/migration-tests/migrations';
 
             SchwiftyMigration.genMigrationFile({
                 models: [require('./migration-tests/Dog')],
-                migrationsDir: relativePath,
+                migrationsDir: absolutePath,
                 knex: session.knex,
                 mode: 'alter'
             }, (err) => {
 
                 expect(err).to.not.exist();
+
+                SchwiftyMigration.genMigrationFile({
+                    models: [require('./migration-tests/Dog')],
+                    migrationsDir: relativePath,
+                    knex: session.knex,
+                    mode: 'alter'
+                }, (err) => {
+
+                    expect(err).to.not.exist();
+
+                    Fs.readdirSync(absolutePath)
+                        .forEach((migrationFile) => {
+
+                            const filePath = Path.join(absolutePath, migrationFile);
+                            Fs.unlinkSync(filePath);
+                        });
+
+                    done();
+                });
+            });
+        });
+    });
+
+    it('Returns "No migration needed" when the db and models are in sync (no-op)', (done) => {
+
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            const migrationsDir = './test/migration-tests/migrations';
+            const seedPath = './test/migration-tests/seed';
+
+            testUtils.setOptionsForAfter(session, seedPath);
+
+            session.knex.migrate.latest({
+                directory: seedPath
+            })
+                .then(() => {
+
+                    SchwiftyMigration.genMigrationFile({
+                        models: [require('./migration-tests/Person')],
+                        migrationsDir,
+                        knex: session.knex,
+                        mode: 'alter'
+                    }, (err, output) => {
+
+                        expect(err).to.not.exist();
+                        expect(output).to.equal('No migration needed');
+
+                        Fs.readdirSync(migrationsDir)
+                            .forEach((migrationFile) => {
+
+                                const filePath = Path.join(migrationsDir, migrationFile);
+                                Fs.unlinkSync(filePath);
+                            });
+
+                        done();
+                    });
+                });
+        });
+    });
+
+    it('Suppresses alter and drop actions if mode is not set to "alter"', (done) => {
+
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            const migrationsDir = './test/migration-tests/migrations';
+            const seedPath = './test/migration-tests/seed';
+
+            testUtils.setOptionsForAfter(session, seedPath);
+
+            session.knex.migrate.latest({
+                directory: seedPath
+            })
+                .then(() => {
+
+                    SchwiftyMigration.genMigrationFile({
+                        models: [require('./migration-tests/AlterPerson')],
+                        migrationsDir,
+                        knex: session.knex,
+                        mode: 'create'
+                    }, (err) => {
+
+                        expect(err).to.not.exist();
+
+                        const expectedMigrationPath = './test/migration-tests/mode-enforcement/create-mode/expected-migration.js';
+                        const actualMigrationContents = testUtils.utils.getLatestMigration(migrationsDir);
+                        const expectedMigrationContents = Fs.readFileSync(expectedMigrationPath).toString('utf8');
+
+                        expect(actualMigrationContents).to.equal(expectedMigrationContents);
+
+                        Fs.readdirSync(migrationsDir)
+                            .forEach((migrationFile) => {
+
+                                const filePath = Path.join(migrationsDir, migrationFile);
+                                Fs.unlinkSync(filePath);
+                            });
+
+                        done();
+                    });
+                });
+        });
+    });
+
+    it('Prints to the console on successful migration file generation', (done) => {
+
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+
+            SchwiftyMigration.genMigrationFile({
+                models: [require('./migration-tests/Dog')],
+                migrationsDir: absolutePath,
+                knex: session.knex,
+                mode: 'alter'
+            }, (err, output) => {
+
+                expect(err).to.not.exist();
+
+                expect(output.includes('_schwifty-migration.js')).to.equal(true);
 
                 Fs.readdirSync(absolutePath)
                     .forEach((migrationFile) => {
@@ -195,159 +325,100 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('Returns "No migration needed" when the db and models are in sync (no-op)', (done) => {
+    it('errors on unsupported Joi schema in model', (done) => {
 
-        const session = initSessions[0];
-        const migrationsDir = './test/migration-tests/migrations';
-        const seedPath = './test/migration-tests/seed';
+        makeSession((err, session) => {
 
-        testUtils.setOptionsForAfter(session, seedPath);
+            if (err) {
+                return done(err);
+            }
 
-        session.knex.migrate.latest({
-            directory: seedPath
-        })
-            .then(() => {
+            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
-                SchwiftyMigration.genMigrationFile({
-                    models: [require('./migration-tests/Person')],
-                    migrationsDir,
-                    knex: session.knex,
-                    mode: 'alter'
-                }, (err, output) => {
+            SchwiftyMigration.genMigrationFile({
+                models: [require('./migration-tests/BadPerson')],
+                migrationsDir: absolutePath,
+                knex: session.knex,
+                mode: 'alter'
+            }, (err) => {
 
-                    expect(err).to.not.exist();
-                    expect(output).to.equal('No migration needed');
-
-                    Fs.readdirSync(migrationsDir)
-                        .forEach((migrationFile) => {
-
-                            const filePath = Path.join(migrationsDir, migrationFile);
-                            Fs.unlinkSync(filePath);
-                        });
-
-                    done();
-                });
+                expect(err).to.exist();
+                expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported.');
+                done();
             });
-    });
-
-    it('Suppresses alter and drop actions if mode is not set to "alter"', (done) => {
-
-        const session = initSessions[0];
-        const migrationsDir = './test/migration-tests/migrations';
-        const seedPath = './test/migration-tests/seed';
-
-        testUtils.setOptionsForAfter(session, seedPath);
-
-        session.knex.migrate.latest({
-            directory: seedPath
-        })
-            .then(() => {
-
-                SchwiftyMigration.genMigrationFile({
-                    models: [require('./migration-tests/AlterPerson')],
-                    migrationsDir,
-                    knex: session.knex,
-                    mode: 'create'
-                }, (err) => {
-
-                    expect(err).to.not.exist();
-
-                    const expectedMigrationPath = './test/migration-tests/mode-enforcement/create-mode/expected-migration.js';
-                    const actualMigrationContents = testUtils.utils.getLatestMigration(migrationsDir);
-                    const expectedMigrationContents = Fs.readFileSync(expectedMigrationPath).toString('utf8');
-
-                    expect(actualMigrationContents).to.equal(expectedMigrationContents);
-
-                    Fs.readdirSync(migrationsDir)
-                        .forEach((migrationFile) => {
-
-                            const filePath = Path.join(migrationsDir, migrationFile);
-                            Fs.unlinkSync(filePath);
-                        });
-
-                    done();
-                });
-            });
-    });
-
-    it('Prints to the console on successful migration file generation', (done) => {
-
-        const session = initSessions[0];
-        const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
-
-        SchwiftyMigration.genMigrationFile({
-            models: [require('./migration-tests/Dog')],
-            migrationsDir: absolutePath,
-            knex: session.knex,
-            mode: 'alter'
-        }, (err, output) => {
-
-            expect(err).to.not.exist();
-
-            expect(output.includes('_schwifty-migration.js')).to.equal(true);
-
-            Fs.readdirSync(absolutePath)
-                .forEach((migrationFile) => {
-
-                    const filePath = Path.join(absolutePath, migrationFile);
-                    Fs.unlinkSync(filePath);
-                });
-
-            done();
         });
     });
 
-    it('errors on unsupported Joi schema in model', (done) => {
+    it('errors when knex\'s columnInfo fails', (done) => {
 
-        const session = initSessions[0];
-        const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+        makeSession((err, session) => {
 
-        SchwiftyMigration.genMigrationFile({
-            models: [require('./migration-tests/BadPerson')],
-            migrationsDir: absolutePath,
-            knex: session.knex,
-            mode: 'alter'
-        }, (err) => {
+            if (err) {
+                return done(err);
+            }
 
-            expect(err).to.exist();
-            expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported.');
-            done();
+            const badKnex = failKnexWith(session.knex, 'columnInfo', 'Column info fail');
+
+            SchwiftyMigration.genMigrationFile({
+                models: [require('./migration-tests/Dog')],
+                migrationsDir: 'some/path',
+                knex: badKnex,
+                mode: 'alter'
+            }, (err) => {
+
+                expect(err).to.exist();
+                expect(err.message).to.equal('Column info fail');
+
+                done();
+            });
         });
     });
 
     it('creates new tables and columns', (done) => {
 
-        initSessions.forEach((session) => {
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
 
             // Run migration tests for `create`
             const createRunner = new TestSuiteRunner('create', session, testUtils);
             createRunner.genTests();
-        });
 
-        done();
+            done();
+        });
     });
 
     it('alters tables', (done) => {
 
-        initSessions.forEach((session) => {
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
 
             // Run migration tests for `alter`
-            const createRunner = new TestSuiteRunner('alter', session, testUtils);
-            createRunner.genTests();
-        });
+            const alterRunner = new TestSuiteRunner('alter', session, testUtils);
+            alterRunner.genTests();
 
-        done();
+            done();
+        });
     });
 
     it('integration testing', (done) => {
 
-        initSessions.forEach((session) => {
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
 
             // Run migration tests for `alter`
-            const createRunner = new TestSuiteRunner('integrated', session, testUtils);
-            createRunner.genTests();
-        });
+            const integrationRunner = new TestSuiteRunner('integrated', session, testUtils);
+            integrationRunner.genTests();
 
-        done();
+            done();
+        });
     });
 });
