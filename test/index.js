@@ -401,9 +401,9 @@ describe('SchwiftyMigration', () => {
                         + 'new migration:';
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column GEOMETRY';
+                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column geometry';
                         expectedOutputMsgToInclude = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person, colName: weirdo_mysql_column, colType: GEOMETRY' + Os.EOL
+                        + 'model: Person, colName: weirdo_mysql_column, colType: geometry' + Os.EOL
                         + 'new migration:';
                     }
                     else {
@@ -474,9 +474,9 @@ describe('SchwiftyMigration', () => {
                         + 'No migration needed';
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column GEOMETRY';
+                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column geometry';
                         expectedOutputMsg = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person, colName: weirdo_mysql_column, colType: GEOMETRY' + Os.EOL
+                        + 'model: Person, colName: weirdo_mysql_column, colType: geometry' + Os.EOL
                         + 'No migration needed';
                     }
                     else {
@@ -515,6 +515,81 @@ describe('SchwiftyMigration', () => {
         });
     });
 
+    it('informs user of skipped unsupported db column types on join table', (done) => {
+
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            const migrationsDir = './test/migration-tests/migrations';
+            const seedPath = './test/migration-tests/seed-join';
+
+            testUtils.setOptionsForAfter(session, seedPath);
+
+            session.knex.migrate.latest({
+                directory: seedPath
+            })
+                .asCallback((err) => {
+
+                    if (err) {
+                        return done(err);
+                    }
+
+                    let rawQuery;
+                    let expectedOutputMsg;
+
+                    if (session.isPostgres()) {
+                        rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_psql_column polygon';
+                        expectedOutputMsg = 'Skipped unsupported columns:' + Os.EOL
+                        + 'model: Person_Movie, colName: weirdo_psql_column, colType: polygon' + Os.EOL
+                        + 'No migration needed';
+                    }
+                    else if (session.isMySql()) {
+                        rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_mysql_column geometry';
+                        expectedOutputMsg = 'Skipped unsupported columns:' + Os.EOL
+                        + 'model: Person_Movie, colName: weirdo_mysql_column, colType: geometry' + Os.EOL
+                        + 'No migration needed';
+                    }
+                    else {
+                        return done(new Error('Db not supported'));
+                    }
+
+                    session.knex.raw(rawQuery)
+                        .asCallback((alterErr) => {
+
+                            if (alterErr) {
+                                return done(alterErr);
+                            }
+
+                            SchwiftyMigration.genMigrationFile({
+                                models: [
+                                    require('./migration-tests/Person'),
+                                    require('./migration-tests/Movie')
+                                ],
+                                migrationsDir,
+                                knex: session.knex,
+                                mode: 'alter'
+                            }, (err, output) => {
+
+                                expect(err).to.not.exist();
+
+                                expect(output).to.equal(expectedOutputMsg);
+
+                                Fs.readdirSync(migrationsDir)
+                                    .forEach((migrationFile) => {
+
+                                        const filePath = Path.join(migrationsDir, migrationFile);
+                                        Fs.unlinkSync(filePath);
+                                    });
+
+                                done();
+                            });
+                        });
+                });
+        });
+    });
 
     it('errors if "No models passed"', (done) => {
 
