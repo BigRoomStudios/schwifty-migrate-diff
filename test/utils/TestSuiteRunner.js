@@ -77,6 +77,8 @@ module.exports = class TestRunner {
 
                     const session = TestSession.cloneSession(rootSession, () => {
 
+                        this.testUtils.setOptionsForAfter(session, migrationsDir);
+
                         const dbInitialized = () => {
 
                             const testModels = this.getModels(Path.join(testPath, 'models'), session);
@@ -110,6 +112,7 @@ module.exports = class TestRunner {
                                     console.error('');
                                     console.error(`Problem with "${itText}"`);
                                     console.error('');
+                                    // return done(new Error('Migration doesnt match'));
                                 }
 
                                 // Ensure the migration matches expected
@@ -129,8 +132,6 @@ module.exports = class TestRunner {
                                 // Let's migrate our generated file and then
                                 // run genMigrationFile again, expecting to see
                                 // 'No migration needed'
-
-                                this.testUtils.setOptionsForAfter(session, migrationsDir);
 
                                 session.knex.migrate.latest({
                                     directory: migrationsDir

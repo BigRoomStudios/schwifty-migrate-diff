@@ -98,13 +98,13 @@ class TestSession {
 
                 if (err) {
 
-                    const augmentedErr = 'Could not connect to '
+                    const augmentedErr = new Error('Could not connect to '
                     + options.knexConfig.client
                     + '. Make sure the server is running and the database '
                     + options.knexConfig.connection.database
                     + ' is created. You can see the test database configurations from file '
-                    + Path.join(__dirname, '../knexfile.js')
-                    + 'Err msg: ' + err.message;
+                    + Path.join(__dirname, '../knexfile.js') + '.'
+                    + ' Err msg: ' + err.message);
 
                     return cb(augmentedErr);
                 };
