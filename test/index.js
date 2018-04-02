@@ -401,9 +401,9 @@ describe('SchwiftyMigration', () => {
                         + 'new migration:';
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column polygon';
+                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column GEOMETRY';
                         expectedOutputMsgToInclude = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person, colName: weirdo_mysql_column, colType: polygon' + Os.EOL
+                        + 'model: Person, colName: weirdo_mysql_column, colType: GEOMETRY' + Os.EOL
                         + 'new migration:';
                     }
                     else {
@@ -474,9 +474,9 @@ describe('SchwiftyMigration', () => {
                         + 'No migration needed';
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column polygon';
+                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column GEOMETRY';
                         expectedOutputMsg = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person, colName: weirdo_mysql_column, colType: polygon' + Os.EOL
+                        + 'model: Person, colName: weirdo_mysql_column, colType: GEOMETRY' + Os.EOL
                         + 'No migration needed';
                     }
                     else {
