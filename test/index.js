@@ -607,7 +607,7 @@ describe('SchwiftyMigration', () => {
             }, (err) => {
 
                 expect(err).to.exist();
-                expect(err.message).to.equal('No models passed');
+                expect(err.message).to.equal('Bad options passed to schwifty-migration: child "models" fails because ["models" must contain at least 1 items]');
 
                 done();
             });
