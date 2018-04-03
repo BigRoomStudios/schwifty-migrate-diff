@@ -780,6 +780,11 @@ describe('SchwiftyMigration', () => {
         });
     });
 
+    // describe('mappings.js', () => {
+    //
+    //     it('maintains parity between output of db2ColumnCompiler and input of columnCompiler2Knex')
+    // });
+
     // Generated, file-based tests (uses the migration-tests folder)
 
     it('creates new tables and columns', (done) => {
