@@ -4,7 +4,7 @@
     "description": "A hapi plugin to aid migration for schwifty models",
     "main": "lib/index.js",
     "scripts": {
-        "test": "lab -a code -t 100 --timeout 10000 -L -I '__core-js_shared__,SharedArrayBuffer,Atomics'",
+        "test": "lab -a code -t 100 --timeout 3000 -L -I '__core-js_shared__,SharedArrayBuffer,Atomics'",
         "test:html": "lab -a code -t 100 -r html -o test.html -L -I '__core-js_shared__,SharedArrayBuffer,Atomics'",
         "lint": "eslint .",
         "coveralls": "lab -r lcov | coveralls"
