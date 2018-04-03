@@ -89,9 +89,9 @@ describe('SchwiftyMigration', () => {
 
     const failKnexWith = (knex, toErrorOn, errMsg, afterTries) => {
 
-        // Grabbed this technique from https://github.com/tgriesser/knex/blob/2e1a459a9e740f24b9a4647bd4da427854e551dd/test/integration/logger.js#L89-L108
-
         afterTries = afterTries || 1;
+
+        // Grabbed this technique from https://github.com/tgriesser/knex/blob/2e1a459a9e740f24b9a4647bd4da427854e551dd/test/integration/logger.js#L89-L108
 
         const originalQb = knex.queryBuilder;
         knex.queryBuilder = () => {
@@ -170,7 +170,11 @@ describe('SchwiftyMigration', () => {
             session.knex.migrate.latest({
                 directory: seedPath
             })
-                .then(() => {
+                .asCallback((err) => {
+
+                    if (err) {
+                        return done(err);
+                    }
 
                     SchwiftyMigration.genMigrationFile({
                         models: [require('./migration-tests/Person')],
@@ -211,7 +215,11 @@ describe('SchwiftyMigration', () => {
             session.knex.migrate.latest({
                 directory: seedPath
             })
-                .then(() => {
+                .asCallback((err) => {
+
+                    if (err) {
+                        return done(err);
+                    }
 
                     SchwiftyMigration.genMigrationFile({
                         models: [require('./migration-tests/AlterPerson')],
