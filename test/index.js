@@ -632,7 +632,7 @@ describe('SchwiftyMigration', () => {
             }, (err) => {
 
                 expect(err).to.exist();
-                expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported.');
+                expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported in model "BadPerson".');
                 done();
             });
         });
@@ -715,6 +715,65 @@ describe('SchwiftyMigration', () => {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported in model "Bad_Person_Movie".');
+
+                done();
+            });
+        });
+    });
+
+    it('errors when a join table uses multiple unsupported Joi schema features', (done) => {
+
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+
+            SchwiftyMigration.genMigrationFile({
+                models: [
+                    require('./migration-tests/Person'),
+                    require('./migration-tests/DoubleBadMovie'),
+                    require('./migration-tests/Double_Bad_Person_Movie')
+                ],
+                migrationsDir: absolutePath,
+                knex: session.knex,
+                mode: 'alter'
+            }, (err, output) => {
+
+                expect(err).to.exist();
+                expect(err.message).to.equal('Joi Schema type(s) "alternatives, alternatives" not supported in model "Double_Bad_Person_Movie".');
+
+                done();
+            });
+        });
+    });
+
+    it('errors when multiple tables use unsupported Joi schema features', (done) => {
+
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+
+            SchwiftyMigration.genMigrationFile({
+                models: [
+                    require('./migration-tests/BadPerson'),
+                    require('./migration-tests/BadZombie')
+                ],
+                migrationsDir: absolutePath,
+                knex: session.knex,
+                mode: 'alter'
+            }, (err, output) => {
+
+                expect(err).to.exist();
+                expect(err.message).to.equal('Multiple errors:' + Os.EOL +
+                'Joi Schema type(s) "alternatives" not supported in model "BadPerson".' + Os.EOL +
+                'Joi Schema type(s) "alternatives" not supported in model "BadZombie".');
 
                 done();
             });
