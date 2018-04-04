@@ -15,15 +15,18 @@ module.exports = {
         );
 
         knex.migrate.currentVersion()
-            .then((cv) => {
+            .asCallback((err, cv) => {
+
+                if (err) {
+                    return next(err);
+                }
 
                 if (cv !== 'none') {
                     return knex.migrate.rollback(config)
-                        .then(() => {
+                        .asCallback((err) => {
 
-                            next();
-                        })
-                        .catch(next);
+                            return next(err);
+                        });
                 }
 
                 next();
@@ -40,15 +43,22 @@ module.exports = {
         );
 
         knex.migrate.currentVersion()
-            .then((cv) => {
+            .asCallback((err, cv) => {
+
+                if (err) {
+                    return next(err);
+                }
 
                 if (cv !== 'none') {
                     return knex.migrate.rollback(config)
-                        .then(() => {
+                        .asCallback((err) => {
+
+                            if (err) {
+                                return next(err);
+                            }
 
                             module.exports.rollbackDb(session, rollbackPath, next);
-                        })
-                        .catch(next);
+                        });
                 }
                 next();
             });

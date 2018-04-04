@@ -86,7 +86,11 @@ class TestSession {
             knex.schema.dropTableIfExists('Person'),
             knex.schema.dropTableIfExists('Zombie'),
             knex.schema.hasTable('knex_migrations')
-                .then((exists) => {
+                .asCallback((err, exists) => {
+
+                    if (err) {
+                        return Promise.reject(err);
+                    }
 
                     if (exists) {
                         return knex('knex_migrations').del();

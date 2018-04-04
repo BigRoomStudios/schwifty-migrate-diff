@@ -136,7 +136,11 @@ module.exports = class TestRunner {
                                 session.knex.migrate.latest({
                                     directory: migrationsDir
                                 })
-                                    .then((...args) => {
+                                    .asCallback((err) => {
+
+                                        if (err) {
+                                            return done(err);
+                                        }
 
                                         SchwiftyMigration.genMigrationFile({
                                             models: testModels,
@@ -195,7 +199,11 @@ module.exports = class TestRunner {
                             session.knex.migrate.latest({
                                 directory: seedPath
                             })
-                                .then((...args) => {
+                                .asCallback((err) => {
+
+                                    if (err) {
+                                        return Promise.reject(err);
+                                    }
 
                                     dbInitialized();
                                 });

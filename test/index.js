@@ -296,6 +296,39 @@ describe('SchwiftyMigration', () => {
         });
     });
 
+    // it('errors when Fs.writeFile fails', (done) => {
+    //
+    //     makeSession((err, session) => {
+    //
+    //         if (err) {
+    //             return done(err);
+    //         }
+    //
+    //         const origWriteFile = Fs.writeFile;
+    //         Fs.writeFile = (...args) => {
+    //
+    //             const cb = args.pop();
+    //             cb(new Error('write failed'));
+    //         };
+    //
+    //         const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+    //
+    //         SchwiftyMigration.genMigrationFile({
+    //             models: [require('./migration-tests/Dog')],
+    //             migrationsDir: absolutePath,
+    //             knex: session.knex,
+    //             mode: 'alter'
+    //         }, (err) => {
+    //
+    //             expect(err).to.exist();
+    //             expect(err.message).to.equal('write failed');
+    //
+    //             Fs.writeFile = origWriteFile;
+    //             done();
+    //         });
+    //     });
+    // });
+
     it('errors on a knex that isn\'t pingable', (done) => {
 
         makeSession((err, session) => {
