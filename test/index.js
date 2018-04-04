@@ -31,7 +31,11 @@ afterEach((done) => {
 
         // Wipe the db!
 
-        Utils.rollbackDb(sessionForAfter, rollbackPath, () => {
+        Utils.rollbackDb(sessionForAfter, rollbackPath, (err) => {
+
+            if (err) {
+                return done(err);
+            }
 
             internals.sessionForAfter = undefined;
             done();
@@ -45,11 +49,7 @@ afterEach((done) => {
             return done();
         }
 
-        sessionForAfter.knex.destroy()
-            .asCallback((err) => {
-
-                done(err);
-            });
+        sessionForAfter.knex.destroy().asCallback(done);
     }
 });
 
@@ -154,7 +154,7 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('returns "No migration needed" when the db and models are in sync (no-op)', (done) => {
+    it('returns NO_MIGRATION when the db and models are in sync (no-op)', (done) => {
 
         makeSession((err, session) => {
 
@@ -184,7 +184,12 @@ describe('SchwiftyMigration', () => {
                     }, (err, output) => {
 
                         expect(err).to.not.exist();
-                        expect(output).to.equal('No migration needed');
+
+                        expect(Utils.compareOutput(output, {
+                            code: SchwiftyMigration.returnCodes.NO_MIGRATION,
+                            file: null,
+                            skippedColumns: []
+                        })).to.equal(true);
 
                         Fs.readdirSync(migrationsDir)
                             .forEach((migrationFile) => {
@@ -196,6 +201,34 @@ describe('SchwiftyMigration', () => {
                         done();
                     });
                 });
+        });
+    });
+
+    it('returns NO_MIGRATION if no models passed', (done) => {
+
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            SchwiftyMigration.genMigrationFile({
+                models: [],
+                migrationsDir: 'some/path',
+                knex: session.knex,
+                mode: 'alter'
+            }, (err, output) => {
+
+                expect(err).to.not.exist();
+
+                expect(Utils.compareOutput(output, {
+                    code: SchwiftyMigration.returnCodes.NO_MIGRATION,
+                    file: null,
+                    skippedColumns: []
+                })).to.equal(true);
+
+                done();
+            });
         });
     });
 
@@ -268,7 +301,11 @@ describe('SchwiftyMigration', () => {
 
                 expect(err).to.not.exist();
 
-                expect(output.includes('_schwifty-migration.js')).to.equal(true);
+                expect(Utils.compareOutput(output, {
+                    code: SchwiftyMigration.returnCodes.MIGRATION,
+                    file: 'truthy',
+                    skippedColumns: []
+                })).to.equal(true);
 
                 Fs.readdirSync(absolutePath)
                     .forEach((migrationFile) => {
@@ -401,7 +438,7 @@ describe('SchwiftyMigration', () => {
                 migrationsDir: absoluteBadPath,
                 knex: session.knex,
                 mode: 'alter'
-            }, (err, output) => {
+            }, (err) => {
 
                 expect(err).to.exist();
                 expect(err.message).to.include('ENOTDIR: not a directory, open \'' + absoluteBadPath);
@@ -433,19 +470,23 @@ describe('SchwiftyMigration', () => {
                     }
 
                     let rawQuery;
-                    let expectedOutputMsgToInclude;
+                    let expectedOutput;
 
                     if (session.isPostgres()) {
                         rawQuery = 'ALTER TABLE "Person" ADD weirdo_psql_column polygon';
-                        expectedOutputMsgToInclude = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person, colName: weirdo_psql_column, colType: polygon' + Os.EOL
-                        + 'new migration:';
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.MIGRATION,
+                            file: 'truthy',
+                            skippedColumns: ['polygon']
+                        };
                     }
                     else if (session.isMySql()) {
                         rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column geometry';
-                        expectedOutputMsgToInclude = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person, colName: weirdo_mysql_column, colType: geometry' + Os.EOL
-                        + 'new migration:';
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.MIGRATION,
+                            file: 'truthy',
+                            skippedColumns: ['geometry']
+                        };
                     }
                     else {
                         return done(new Error('Db not supported'));
@@ -467,7 +508,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(output).to.include(expectedOutputMsgToInclude);
+                                expect(Utils.compareOutput(output, expectedOutput)).to.equal(true);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {
@@ -506,19 +547,23 @@ describe('SchwiftyMigration', () => {
                     }
 
                     let rawQuery;
-                    let expectedOutputMsg;
+                    let expectedOutput;
 
                     if (session.isPostgres()) {
                         rawQuery = 'ALTER TABLE "Person" ADD weirdo_psql_column polygon';
-                        expectedOutputMsg = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person, colName: weirdo_psql_column, colType: polygon' + Os.EOL
-                        + 'No migration needed';
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.NO_MIGRATION,
+                            file: null,
+                            skippedColumns: ['polygon']
+                        };
                     }
                     else if (session.isMySql()) {
                         rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column geometry';
-                        expectedOutputMsg = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person, colName: weirdo_mysql_column, colType: geometry' + Os.EOL
-                        + 'No migration needed';
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.NO_MIGRATION,
+                            file: null,
+                            skippedColumns: ['geometry']
+                        };
                     }
                     else {
                         return done(new Error('Db not supported'));
@@ -540,7 +585,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(output).to.equal(expectedOutputMsg);
+                                expect(Utils.compareOutput(output, expectedOutput)).to.equal(true);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {
@@ -579,19 +624,25 @@ describe('SchwiftyMigration', () => {
                     }
 
                     let rawQuery;
-                    let expectedOutputMsg;
+                    let expectedOutput;
 
                     if (session.isPostgres()) {
                         rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_psql_column polygon';
-                        expectedOutputMsg = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person_Movie, colName: weirdo_psql_column, colType: polygon' + Os.EOL
-                        + 'No migration needed';
+
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.NO_MIGRATION,
+                            file: null,
+                            skippedColumns: ['polygon']
+                        };
                     }
                     else if (session.isMySql()) {
                         rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_mysql_column geometry';
-                        expectedOutputMsg = 'Skipped unsupported columns:' + Os.EOL
-                        + 'model: Person_Movie, colName: weirdo_mysql_column, colType: geometry' + Os.EOL
-                        + 'No migration needed';
+
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.NO_MIGRATION,
+                            file: null,
+                            skippedColumns: ['geometry']
+                        };
                     }
                     else {
                         return done(new Error('Db not supported'));
@@ -616,7 +667,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(output).to.equal(expectedOutputMsg);
+                                expect(Utils.compareOutput(output, expectedOutput)).to.equal(true);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {
@@ -629,29 +680,6 @@ describe('SchwiftyMigration', () => {
                             });
                         });
                 });
-        });
-    });
-
-    it('errors if "No models passed"', (done) => {
-
-        makeSession((err, session) => {
-
-            if (err) {
-                return done(err);
-            }
-
-            SchwiftyMigration.genMigrationFile({
-                models: [],
-                migrationsDir: 'some/path',
-                knex: session.knex,
-                mode: 'alter'
-            }, (err) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Bad options passed to schwifty-migration: child "models" fails because ["models" must contain at least 1 items]');
-
-                done();
-            });
         });
     });
 
@@ -752,7 +780,7 @@ describe('SchwiftyMigration', () => {
                 migrationsDir: absolutePath,
                 knex: session.knex,
                 mode: 'alter'
-            }, (err, output) => {
+            }, (err) => {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Joi Schema type(s) "alternatives" not supported in model "Bad_Person_Movie".');
@@ -781,7 +809,7 @@ describe('SchwiftyMigration', () => {
                 migrationsDir: absolutePath,
                 knex: session.knex,
                 mode: 'alter'
-            }, (err, output) => {
+            }, (err) => {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Joi Schema type(s) "alternatives, alternatives" not supported in model "Double_Bad_Person_Movie".');
@@ -809,7 +837,7 @@ describe('SchwiftyMigration', () => {
                 migrationsDir: absolutePath,
                 knex: session.knex,
                 mode: 'alter'
-            }, (err, output) => {
+            }, (err) => {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Multiple errors:' + Os.EOL +

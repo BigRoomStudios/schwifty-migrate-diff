@@ -5,6 +5,25 @@ const Path = require('path');
 
 module.exports = {
 
+    compareOutput: (output, expectedOutput) => {
+
+        if (output.code !== expectedOutput.code) {
+            return false;
+        }
+
+        if (String(output.skippedCols) !== String(expectedOutput.skippedCols)) {
+            return false;
+        }
+
+        // Just check if this is truthy or not -- we don't know the timestamp
+        // Knex is going to assign to the filename
+        if (Boolean(output.file) !== Boolean(expectedOutput.file)) {
+            return false;
+        }
+
+        return true;
+    },
+
     rollbackDbOnce: (session, rollbackPath, next) => {
 
         const { knex } = session;

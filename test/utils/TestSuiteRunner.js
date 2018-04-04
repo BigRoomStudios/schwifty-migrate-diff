@@ -112,11 +112,16 @@ module.exports = class TestRunner {
                                     console.error('');
                                     console.error(`Problem with "${itText}"`);
                                     console.error('');
-                                    // return done(new Error('Migration doesnt match'));
                                 }
 
                                 // Ensure the migration matches expected
                                 expect(actualMigrationContents).to.equal(expectedMigrationContents);
+
+                                expect(utils.compareOutput(output, {
+                                    code: SchwiftyMigration.returnCodes.MIGRATION,
+                                    file: 'truthy',
+                                    skippedColumns: []
+                                })).to.equal(true);
 
                                 // Now run the just created migration to make sure the code is valid!
 
@@ -153,7 +158,11 @@ module.exports = class TestRunner {
                                                 return done(err);
                                             }
 
-                                            expect(noMigrationNeededOutput).to.equal('No migration needed');
+                                            expect(utils.compareOutput(noMigrationNeededOutput, {
+                                                code: SchwiftyMigration.returnCodes.NO_MIGRATION,
+                                                file: null,
+                                                skippedColumns: []
+                                            })).to.equal(true);
 
                                             // Finally, we'll test the rollback code
                                             // let's rollback this migration,
@@ -167,7 +176,7 @@ module.exports = class TestRunner {
 
                                                 // Delete the migration file (leave seed file(s))
 
-                                                Fs.unlinkSync(output);
+                                                Fs.unlinkSync(output.file);
 
                                                 SchwiftyMigration.genMigrationFile({
                                                     models: testModels,
@@ -181,7 +190,13 @@ module.exports = class TestRunner {
                                                         return done(err);
                                                     }
 
-                                                    expect(Fs.readFileSync(afterRollbackOutput).toString('utf8')).to.equal(expectedMigrationContents);
+                                                    expect(utils.compareOutput(afterRollbackOutput, {
+                                                        code: SchwiftyMigration.returnCodes.MIGRATION,
+                                                        file: 'truthy',
+                                                        skippedColumns: []
+                                                    })).to.equal(true);
+
+                                                    expect(Fs.readFileSync(afterRollbackOutput.file).toString('utf8')).to.equal(expectedMigrationContents);
 
                                                     process.stdout.write('.');
                                                     done();
