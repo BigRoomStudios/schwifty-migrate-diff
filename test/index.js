@@ -13,6 +13,8 @@ const KnexConfigs = require('./knexfile');
 const TestSession = require('./utils/TestSession');
 const TestSuiteRunner = require('./utils/TestSuiteRunner');
 const SchwiftyMigration = require('../lib');
+const MigrationMaps = require('../lib/mappings').maps;
+const Promise = require('bluebird');
 
 // Test shortcuts
 
@@ -359,6 +361,8 @@ describe('SchwiftyMigration', () => {
     //
     //             expect(err).to.exist();
     //             expect(err.message).to.equal('write failed');
+    //
+    //             // console.log('err.message', err.message);
     //
     //             Fs.writeFile = origWriteFile;
     //             done();
@@ -849,10 +853,21 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    // describe('mappings.js', () => {
-    //
-    //     it('maintains parity between output of db2ColumnCompiler and input of columnCompiler2Knex')
-    // });
+    describe('mappings.js', () => {
+
+        it('maintains parity between output of db2ColumnCompiler and input of columnCompiler2Knex', (done) => {
+
+            const aliasKeys = Object.keys(MigrationMaps.aliasMap);
+            const columnCompilerKnexMapKeys = Object.keys(MigrationMaps.columnCompilerKnexMap);
+
+            aliasKeys.forEach((key) => {
+
+                expect(columnCompilerKnexMapKeys.includes(key)).to.equal(true);
+            });
+
+            done();
+        });
+    });
 
     // Generated, file-based tests (uses the migration-tests folder)
 
