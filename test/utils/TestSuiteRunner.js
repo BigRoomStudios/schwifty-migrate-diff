@@ -197,8 +197,6 @@ module.exports = class TestRunner {
                                                     })).to.equal(true);
 
                                                     expect(Fs.readFileSync(afterRollbackOutput.file).toString('utf8')).to.equal(expectedMigrationContents);
-
-                                                    process.stdout.write('.');
                                                     done();
                                                 });
                                             });

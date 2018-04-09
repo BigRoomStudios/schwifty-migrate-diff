@@ -13,7 +13,7 @@ const KnexConfigs = require('./knexfile');
 const TestSession = require('./utils/TestSession');
 const TestSuiteRunner = require('./utils/TestSuiteRunner');
 const SchwiftyMigration = require('../lib');
-const MigrationMaps = require('../lib/mappings').maps;
+const Mappings = require('../lib/mappings');
 const Promise = require('bluebird');
 
 // Test shortcuts
@@ -335,40 +335,50 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    // it('errors when Fs.writeFile fails', (done) => {
-    //
-    //     makeSession((err, session) => {
-    //
-    //         if (err) {
-    //             return done(err);
-    //         }
-    //
-    //         const origWriteFile = Fs.writeFile;
-    //         Fs.writeFile = (...args) => {
-    //
-    //             const cb = args.pop();
-    //             cb(new Error('write failed'));
-    //         };
-    //
-    //         const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
-    //
-    //         SchwiftyMigration.genMigrationFile({
-    //             models: [require('./migration-tests/Dog')],
-    //             migrationsDir: absolutePath,
-    //             knex: session.knex,
-    //             mode: 'alter'
-    //         }, (err) => {
-    //
-    //             expect(err).to.exist();
-    //             expect(err.message).to.equal('write failed');
-    //
-    //             // console.log('err.message', err.message);
-    //
-    //             Fs.writeFile = origWriteFile;
-    //             done();
-    //         });
-    //     });
-    // });
+    it('errors when Fs.writeFile fails', (done, onCleanup) => {
+
+        makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            let afterTries = 2;
+
+            const origWriteFile = Fs.writeFile;
+
+            onCleanup((next) => {
+
+                Fs.writeFile = origWriteFile;
+                return next();
+            });
+
+            Fs.writeFile = (...args) => {
+
+                if (--afterTries === 0) {
+                    const cb = args.pop();
+                    return cb(new Error('write failed'));
+                }
+
+                return origWriteFile.apply(this, args);
+            };
+
+            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+
+            SchwiftyMigration.genMigrationFile({
+                models: [require('./migration-tests/Dog')],
+                migrationsDir: absolutePath,
+                knex: session.knex,
+                mode: 'alter'
+            }, (err) => {
+
+                expect(err).to.exist();
+                expect(err.message).to.equal('write failed');
+
+                done();
+            });
+        });
+    });
 
     it('errors on a knex that isn\'t pingable', (done) => {
 
@@ -485,11 +495,11 @@ describe('SchwiftyMigration', () => {
                         };
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column geometry';
+                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column set';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.MIGRATION,
                             file: 'truthy',
-                            skippedColumns: ['geometry']
+                            skippedColumns: ['set']
                         };
                     }
                     else {
@@ -857,13 +867,23 @@ describe('SchwiftyMigration', () => {
 
         it('maintains parity between output of db2ColumnCompiler and input of columnCompiler2Knex', (done) => {
 
-            const aliasKeys = Object.keys(MigrationMaps.aliasMap);
-            const columnCompilerKnexMapKeys = Object.keys(MigrationMaps.columnCompilerKnexMap);
+            const aliasKeys = Object.keys(Mappings.maps.aliasMap);
+            const columnCompilerKnexMapKeys = Object.keys(Mappings.maps.columnCompilerKnexMap);
 
             aliasKeys.forEach((key) => {
 
                 expect(columnCompilerKnexMapKeys.includes(key)).to.equal(true);
             });
+
+            done();
+        });
+
+        it('returns error early from db2Knex if problems arise in "db2ColumnCompiler"', (done) => {
+
+            const [err, val] = Mappings.convertFuncs.db2Knex('bogusType');
+
+            expect(err.message).to.equal('Alias not found for bogusType.');
+            expect(val).to.not.exist();
 
             done();
         });
