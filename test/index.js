@@ -8,6 +8,7 @@ const Path = require('path');
 
 const Lab = require('lab');
 const Code = require('code');
+const Hoek = require('hoek');
 
 const KnexConfigs = require('./knexfile');
 const TestSession = require('./utils/TestSession');
@@ -58,10 +59,7 @@ internals.setupCleanup = (onCleanup, session, extras) => {
 
     extras((err) => {
 
-        if (err) {
-            throw err;
-        }
-
+        Hoek.assert(!err, `Err in cleanup: "${err}"`);
         process.nextTick(() => onCleanup(internals.cleanup.bind(null, session)));
     });
 };
@@ -112,9 +110,7 @@ const testDb = envDB || 'postgres';
 
 const knexConfig = KnexConfigs.find((conf) => conf.client === testDb);
 
-if (!knexConfig) {
-    throw new Error(`Unsupported db "${testDb}"`);
-}
+Hoek.assert(knexConfig, `Unsupported db "${testDb}"`);
 
 describe('SchwiftyMigration', () => {
 
