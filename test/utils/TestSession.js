@@ -78,26 +78,8 @@ class TestSession {
         const knex = this.knex;
         const options = this.options;
 
-        return Promise.all([
-            knex.schema.dropTableIfExists('Dog'),
-            knex.schema.dropTableIfExists('Movie'),
-            knex.schema.dropTableIfExists('Person_Movie'),
-            knex.schema.dropTableIfExists('Dog_Movie'),
-            knex.schema.dropTableIfExists('Person'),
-            knex.schema.dropTableIfExists('Zombie'),
-            knex.schema.hasTable('knex_migrations')
-                .asCallback((err, exists) => {
-
-                    if (err) {
-                        return Promise.reject(err);
-                    }
-
-                    if (exists) {
-                        return knex('knex_migrations').del();
-                    }
-                    return Promise.resolve();
-                })
-        ])
+        // Just ping the db first
+        knex.queryBuilder().select(knex.raw('1'))
             .asCallback((err) => {
 
                 if (err) {

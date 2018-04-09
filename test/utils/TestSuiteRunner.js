@@ -22,31 +22,15 @@ module.exports = class TestRunner {
         });
     }
 
-    genTests(stepsToGen) {
-
-        const stepsToFilterFor = [].concat(stepsToGen).filter((item) => item);
+    genTests() {
 
         const { expect, lab: { describe, it }, utils } = this.testUtils;
-
-        let filteredTests = this.testsInSuite;
-
-        if (stepsToFilterFor.length > 0) {
-            filteredTests = this.testsInSuite.filter((testName) => {
-
-                return stepsToFilterFor.find((filterSearch) => {
-
-                    return testName.indexOf(filterSearch) !== -1;
-                });
-            });
-
-            console.log('Tests filtered to run:', filteredTests);
-        };
 
         const rootSession = this.session;
 
         describe(`"${rootSession.options.knexConfig.client} ${this.testType}" tests:`, () => {
 
-            filteredTests.forEach((testName) => {
+            this.testsInSuite.forEach((testName) => {
 
                 const testPath = Path.join(this.testSuitePath, testName);
                 const itText = require(Path.join(testPath, 'it'));
@@ -70,20 +54,14 @@ module.exports = class TestRunner {
 
                 const expectedMigrationPath = Path.join(testPath, 'expected-migration.js');
 
-                it(itText, (done) => {
+                it(itText, (done, onCleanup) => {
 
                     // Clone a new session for each test
                     // This also wipes the db for a fresh start =)
 
                     const session = TestSession.cloneSession(rootSession, () => {
 
-                        this.testUtils.setOptionsForAfter(session, migrationsDir);
-
-                        const dbInitialized = () => {
-
-                            const testModels = this.getModels(Path.join(testPath, 'models'), session);
-
-                            // empty migrationsDir folder (cleanup)
+                        this.testUtils.setupCleanup(onCleanup, session, (done) => {
 
                             Fs.readdirSync(migrationsDir)
                                 .forEach((migrationFile) => {
@@ -91,6 +69,12 @@ module.exports = class TestRunner {
                                     const filePath = Path.join(migrationsDir, migrationFile);
                                     Fs.unlinkSync(filePath);
                                 });
+                            done();
+                        });
+
+                        const dbInitialized = () => {
+
+                            const testModels = this.getModels(Path.join(testPath, 'models'), session);
 
                             SchwiftyMigration.genMigrationFile({
                                 models: testModels,

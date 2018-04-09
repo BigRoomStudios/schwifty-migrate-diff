@@ -2,6 +2,7 @@
 
 const Fs = require('fs');
 const Path = require('path');
+const Promise = require('bluebird');
 
 module.exports = {
 
@@ -24,7 +25,47 @@ module.exports = {
         return true;
     },
 
-    rollbackDbOnce: (session, rollbackPath, next) => {
+    wipeDb: (session, done) => {
+
+        // Wipe the db!
+
+        if (!session) {
+            return done();
+        }
+
+        const knex = session.knex;
+
+        const tablePromises = [
+            'AlterPerson',
+            'Bad_Person_Movie',
+            'BadMovie',
+            'BadMovieWithBadPersonRef',
+            'BadPerson',
+            'BadZombie',
+            'Dog',
+            'Double_Bad_Person_Movie',
+            'DoubleBadMovie',
+            'Movie',
+            'Person_Movie',
+            'Dog_Movie',
+            'Person',
+            'Zombie',
+            // Delete this, knex will re-create it
+            'knex_migrations'
+        ].map((tblName) => knex.schema.dropTableIfExists(tblName));
+
+        Promise.all(tablePromises)
+            .asCallback((err) => {
+
+                if (err) {
+                    return done(err);
+                }
+
+                done();
+            });
+    },
+
+    rollbackDbOnce: (session, rollbackPath, done) => {
 
         const { knex } = session;
         const config = Object.assign(
@@ -37,22 +78,22 @@ module.exports = {
             .asCallback((err, cv) => {
 
                 if (err) {
-                    return next(err);
+                    return done(err);
                 }
 
                 if (cv !== 'none') {
                     return knex.migrate.rollback(config)
                         .asCallback((err) => {
 
-                            return next(err);
+                            return done(err);
                         });
                 }
 
-                next();
+                done();
             });
     },
 
-    rollbackDb: (session, rollbackPath, next) => {
+    rollbackDb: (session, rollbackPath, done) => {
 
         const { knex } = session;
         const config = Object.assign(
@@ -65,7 +106,7 @@ module.exports = {
             .asCallback((err, cv) => {
 
                 if (err) {
-                    return next(err);
+                    return done(err);
                 }
 
                 if (cv !== 'none') {
@@ -73,13 +114,13 @@ module.exports = {
                         .asCallback((err) => {
 
                             if (err) {
-                                return next(err);
+                                return done(err);
                             }
 
-                            module.exports.rollbackDb(session, rollbackPath, next);
+                            module.exports.rollbackDb(session, rollbackPath, done);
                         });
                 }
-                next();
+                done();
             });
     },
 

@@ -20,52 +20,93 @@ const Promise = require('bluebird');
 
 const lab = exports.lab = Lab.script({ schedule: false });
 const expect = Code.expect;
-const { describe, it, afterEach } = lab;
+const { describe, it, before } = lab;
 const Utils = require('./utils');
 
 const internals = {};
 
-afterEach((done) => {
+internals.cleanup = (session, done) => {
 
-    const { sessionForAfter, rollbackPath } = internals;
+    // Wipe the db!
 
-    if (rollbackPath) {
-
-        // Wipe the db!
-
-        Utils.rollbackDb(sessionForAfter, rollbackPath, (err) => {
-
-            if (err) {
-                return done(err);
-            }
-
-            internals.sessionForAfter = undefined;
-            done();
-        });
+    if (!session) {
+        return done();
     }
-    else {
-        internals.sessionForAfter = undefined;
-        internals.rollbackPath = undefined;
 
-        if (!sessionForAfter) {
-            return done();
+    Utils.wipeDb(session, (err) => {
+
+        if (err) {
+            return done(err);
         }
 
-        sessionForAfter.knex.destroy().asCallback(done);
-    }
-});
+        const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
-const setOptionsForAfter = (session, rollbackPath) => {
+        Fs.readdirSync(absolutePath)
+            .forEach((migrationFile) => {
 
-    internals.sessionForAfter = session;
-    internals.rollbackPath = rollbackPath;
+                const filePath = Path.join(absolutePath, migrationFile);
+                Fs.unlinkSync(filePath);
+            });
+
+        session.knex.destroy().asCallback(done);
+    });
 };
 
-const testUtils = {
+internals.setupCleanup = (onCleanup, session, extras) => {
+
+    if (typeof extras !== 'function') {
+        extras = (done) => done();
+    }
+
+    extras((err) => {
+
+        if (err) {
+            throw err;
+        }
+
+        process.nextTick(() => onCleanup(internals.cleanup.bind(null, session)));
+    });
+};
+
+internals.makeSession = (cb) => {
+
+    const session = new TestSession({ options: { knexConfig } },
+        (err) => {
+
+            cb(err, session);
+        });
+};
+
+internals.failKnexWith = (knex, toErrorOn, errMsg, afterTries) => {
+
+    afterTries = afterTries || 1;
+
+    // Based this patching technique off https://github.com/tgriesser/knex/blob/2e1a459a9e740f24b9a4647bd4da427854e551dd/test/integration/logger.js#L89-L108
+
+    const originalQb = knex.queryBuilder;
+    knex.queryBuilder = () => {
+
+        const qb = originalQb.apply(this, arguments);
+        const origToErrorFunc = qb[toErrorOn].bind(qb);
+
+        qb[toErrorOn] = (...args) => {
+
+            if (--afterTries === 0) {
+                return Promise.reject(new Error(errMsg));
+            }
+            return origToErrorFunc(...args);
+        };
+        return qb;
+    };
+
+    return knex;
+};
+
+internals.testUtils = {
     lab,
     expect,
     utils: Utils,
-    setOptionsForAfter
+    setupCleanup: internals.setupCleanup
 };
 
 const envDB = process.env.DB;
@@ -79,48 +120,33 @@ if (!knexConfig) {
 
 describe('SchwiftyMigration', () => {
 
-    const makeSession = (cb) => {
+    before((done) => {
 
-        const session = new TestSession({ options: { knexConfig } },
-            (err) => {
-
-                setOptionsForAfter(session);
-                cb(err, session);
-            });
-    };
-
-    const failKnexWith = (knex, toErrorOn, errMsg, afterTries) => {
-
-        afterTries = afterTries || 1;
-
-        // Grabbed this technique from https://github.com/tgriesser/knex/blob/2e1a459a9e740f24b9a4647bd4da427854e551dd/test/integration/logger.js#L89-L108
-
-        const originalQb = knex.queryBuilder;
-        knex.queryBuilder = () => {
-
-            const qb = originalQb.apply(this, arguments);
-            const origToErrorFunc = qb[toErrorOn].bind(qb);
-
-            qb[toErrorOn] = (...args) => {
-
-                if (--afterTries === 0) {
-                    return Promise.reject(new Error(errMsg));
-                }
-                return origToErrorFunc(...args);
-            };
-            return qb;
-        };
-
-        return knex;
-    };
-
-    it('accepts absolute and relative migration file paths', (done) => {
-
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            Utils.wipeDb(session, (err) => {
+
+                if (err) {
+                    return done(err);
+                }
+                session.knex.destroy().asCallback(done);
+            });
+        });
+    });
+
+    it('accepts absolute and relative migration file paths', (done, onCleanup) => {
+
+        internals.makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
             const relativePath = './test/migration-tests/migrations';
@@ -142,32 +168,24 @@ describe('SchwiftyMigration', () => {
                 }, (err) => {
 
                     expect(err).to.not.exist();
-
-                    Fs.readdirSync(absolutePath)
-                        .forEach((migrationFile) => {
-
-                            const filePath = Path.join(absolutePath, migrationFile);
-                            Fs.unlinkSync(filePath);
-                        });
-
                     done();
                 });
             });
         });
     });
 
-    it('returns NO_MIGRATION when the db and models are in sync (no-op)', (done) => {
+    it('returns NO_MIGRATION when the db and models are in sync (no-op)', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
+            internals.testUtils.setupCleanup(onCleanup, session);
+
             const migrationsDir = './test/migration-tests/migrations';
             const seedPath = './test/migration-tests/seed';
-
-            testUtils.setOptionsForAfter(session, seedPath);
 
             session.knex.migrate.latest({
                 directory: seedPath
@@ -206,13 +224,15 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('returns NO_MIGRATION if no models passed', (done) => {
+    it('returns NO_MIGRATION if no models passed', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             SchwiftyMigration.genMigrationFile({
                 models: [],
@@ -234,18 +254,18 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('suppresses alter and drop actions if mode is not set to "alter"', (done) => {
+    it('suppresses alter and drop actions if mode is not set to "alter"', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
+            internals.testUtils.setupCleanup(onCleanup, session);
+
             const migrationsDir = './test/migration-tests/migrations';
             const seedPath = './test/migration-tests/seed';
-
-            testUtils.setOptionsForAfter(session, seedPath);
 
             session.knex.migrate.latest({
                 directory: seedPath
@@ -266,7 +286,7 @@ describe('SchwiftyMigration', () => {
                         expect(err).to.not.exist();
 
                         const expectedMigrationPath = './test/migration-tests/mode-enforcement/create-mode/expected-migration.js';
-                        const actualMigrationContents = testUtils.utils.getLatestMigration(migrationsDir);
+                        const actualMigrationContents = internals.testUtils.utils.getLatestMigration(migrationsDir);
                         const expectedMigrationContents = Fs.readFileSync(expectedMigrationPath).toString('utf8');
 
                         expect(actualMigrationContents).to.equal(expectedMigrationContents);
@@ -284,13 +304,15 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('returns generated migration file path on success', (done) => {
+    it('returns generated migration file path on success', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
@@ -309,13 +331,6 @@ describe('SchwiftyMigration', () => {
                     skippedColumns: []
                 })).to.equal(true);
 
-                Fs.readdirSync(absolutePath)
-                    .forEach((migrationFile) => {
-
-                        const filePath = Path.join(absolutePath, migrationFile);
-                        Fs.unlinkSync(filePath);
-                    });
-
                 done();
             });
         });
@@ -323,7 +338,7 @@ describe('SchwiftyMigration', () => {
 
     // All the errors
 
-    it('errors if you give bad options', (done) => {
+    it('errors if you give bad options', (done, onCleanup) => {
 
         SchwiftyMigration.genMigrationFile({
             invalid: 'options!'
@@ -337,21 +352,21 @@ describe('SchwiftyMigration', () => {
 
     it('errors when Fs.writeFile fails', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
-            let afterTries = 2;
-
             const origWriteFile = Fs.writeFile;
 
-            onCleanup((next) => {
+            internals.testUtils.setupCleanup(onCleanup, session, (done) => {
 
                 Fs.writeFile = origWriteFile;
-                return next();
+                done();
             });
+
+            let afterTries = 2;
 
             Fs.writeFile = (...args) => {
 
@@ -380,15 +395,17 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors on a knex that isn\'t pingable', (done) => {
+    it('errors on a knex that isn\'t pingable', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
-            const badKnex = failKnexWith(session.knex, 'select', 'Not pingable');
+            internals.testUtils.setupCleanup(onCleanup, session);
+
+            const badKnex = internals.failKnexWith(session.knex, 'select', 'Not pingable');
 
             SchwiftyMigration.genMigrationFile({
                 models: [require('./migration-tests/Dog')],
@@ -405,13 +422,15 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors on a knex that has issues pinging a table', (done) => {
+    it('errors on a knex that has issues pinging a table', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             // The first time schwifty-migration uses `select` is when pinging the
             // db for general connectivity. The next time it uses `select` will be
@@ -419,7 +438,7 @@ describe('SchwiftyMigration', () => {
 
             // So we ask failKnexWith to fail after 2 tries to make it work correctly for the first select
             // and fail on the 2nd one.
-            const badKnex = failKnexWith(session.knex, 'select', 'Error when pinging table', 2);
+            const badKnex = internals.failKnexWith(session.knex, 'select', 'Error when pinging table', 2);
 
             SchwiftyMigration.genMigrationFile({
                 models: [require('./migration-tests/Dog')],
@@ -436,13 +455,15 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors if knex migrate fails', (done) => {
+    it('errors if knex migrate fails', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             // Setting the migrations dir path to a file
             const absoluteBadPath = Path.join(process.cwd(), 'test/migration-tests/Person.js');
@@ -461,18 +482,18 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('informs user of skipped unsupported db column types with other changes', (done) => {
+    it('informs user of skipped unsupported db column types with other changes', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
+            internals.testUtils.setupCleanup(onCleanup, session);
+
             const migrationsDir = './test/migration-tests/migrations';
             const seedPath = './test/migration-tests/seed';
-
-            testUtils.setOptionsForAfter(session, seedPath);
 
             session.knex.migrate.latest({
                 directory: seedPath
@@ -538,18 +559,18 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('informs user of skipped unsupported db column types and no other changes', (done) => {
+    it('informs user of skipped unsupported db column types and no other changes', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
+            internals.testUtils.setupCleanup(onCleanup, session);
+
             const migrationsDir = './test/migration-tests/migrations';
             const seedPath = './test/migration-tests/seed';
-
-            testUtils.setOptionsForAfter(session, seedPath);
 
             session.knex.migrate.latest({
                 directory: seedPath
@@ -615,18 +636,18 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('informs user of skipped unsupported db column types on join table', (done) => {
+    it('informs user of skipped unsupported db column types on join table', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
+            internals.testUtils.setupCleanup(onCleanup, session);
+
             const migrationsDir = './test/migration-tests/migrations';
             const seedPath = './test/migration-tests/seed-join';
-
-            testUtils.setOptionsForAfter(session, seedPath);
 
             session.knex.migrate.latest({
                 directory: seedPath
@@ -695,13 +716,15 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors on unsupported Joi schema in model', (done) => {
+    it('errors on unsupported Joi schema in model', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
@@ -719,15 +742,17 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors when knex\'s columnInfo fails for regular model', (done) => {
+    it('errors when knex\'s columnInfo fails for regular model', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
-            const badKnex = failKnexWith(session.knex, 'columnInfo', 'Column info fail regular model');
+            internals.testUtils.setupCleanup(onCleanup, session);
+
+            const badKnex = internals.failKnexWith(session.knex, 'columnInfo', 'Column info fail regular model');
 
             SchwiftyMigration.genMigrationFile({
                 models: [require('./migration-tests/Dog')],
@@ -744,15 +769,17 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors when knex\'s columnInfo fails for join table', (done) => {
+    it('errors when knex\'s columnInfo fails for join table', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
-            const badKnex = failKnexWith(session.knex, 'columnInfo', 'Column info fail join table');
+            internals.testUtils.setupCleanup(onCleanup, session);
+
+            const badKnex = internals.failKnexWith(session.knex, 'columnInfo', 'Column info fail join table');
 
             SchwiftyMigration.genMigrationFile({
                 models: [
@@ -773,13 +800,15 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors when a join table uses an unsupported Joi schema', (done) => {
+    it('errors when a join table uses an unsupported Joi schema', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
@@ -802,13 +831,15 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors when a join table uses multiple unsupported Joi schema features', (done) => {
+    it('errors when a join table uses multiple unsupported Joi schema features', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
@@ -831,13 +862,15 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('errors when multiple tables use unsupported Joi schema features', (done) => {
+    it('errors when multiple tables use unsupported Joi schema features', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
 
             const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
 
@@ -889,48 +922,54 @@ describe('SchwiftyMigration', () => {
 
     // Generated, file-based tests (uses the migration-tests folder)
 
-    it('creates new tables and columns', (done) => {
+    it('creates new tables and columns', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
+            internals.testUtils.setupCleanup(onCleanup, session);
+
             // Run migration tests for `create`
-            const createRunner = new TestSuiteRunner('create', session, testUtils);
+            const createRunner = new TestSuiteRunner('create', session, internals.testUtils);
             createRunner.genTests();
 
             done();
         });
     });
 
-    it('alters tables', (done) => {
+    it('alters tables', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
+            internals.testUtils.setupCleanup(onCleanup, session);
+
             // Run migration tests for `alter`
-            const alterRunner = new TestSuiteRunner('alter', session, testUtils);
+            const alterRunner = new TestSuiteRunner('alter', session, internals.testUtils);
             alterRunner.genTests();
 
             done();
         });
     });
 
-    it('integration testing', (done) => {
+    it('integration testing', (done, onCleanup) => {
 
-        makeSession((err, session) => {
+        internals.makeSession((err, session) => {
 
             if (err) {
                 return done(err);
             }
 
+            internals.testUtils.setupCleanup(onCleanup, session);
+
             // Run migration tests for `alter`
-            const integrationRunner = new TestSuiteRunner('integrated', session, testUtils);
+            const integrationRunner = new TestSuiteRunner('integrated', session, internals.testUtils);
             integrationRunner.genTests();
 
             done();
