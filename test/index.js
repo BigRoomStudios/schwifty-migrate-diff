@@ -495,7 +495,7 @@ describe('SchwiftyMigration', () => {
                         };
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column set';
+                        rawQuery = 'ALTER TABLE "Person_Movie" ADD COLUMN weirdo_mysql_column SET';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.MIGRATION,
                             file: 'truthy',
@@ -572,11 +572,11 @@ describe('SchwiftyMigration', () => {
                         };
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_mysql_column geometry';
+                        rawQuery = 'ALTER TABLE "Person_Movie" ADD COLUMN weirdo_mysql_column SET';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
-                            skippedColumns: ['geometry']
+                            skippedColumns: ['set']
                         };
                     }
                     else {
@@ -642,7 +642,6 @@ describe('SchwiftyMigration', () => {
 
                     if (session.isPostgres()) {
                         rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_psql_column polygon';
-
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
@@ -650,12 +649,11 @@ describe('SchwiftyMigration', () => {
                         };
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_mysql_column geometry';
-
+                        rawQuery = 'ALTER TABLE "Person_Movie" ADD COLUMN weirdo_mysql_column SET';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
-                            skippedColumns: ['geometry']
+                            skippedColumns: ['set']
                         };
                     }
                     else {
