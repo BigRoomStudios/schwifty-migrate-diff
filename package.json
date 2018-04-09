@@ -32,14 +32,12 @@
     },
     "homepage": "https://github.com/BigRoomStudios/schwifty-migration#readme",
     "dependencies": {
-        "chalk": "^1.1.3",
         "handlebars": "^4.0.8",
-        "inquirer": "^2.0.0",
+        "hoek": "^5.0.3",
         "items": "^2.1.1",
         "joi": "^13.0.1",
         "jsondiffpatch": "^0.2.4",
-        "knex": "^0.13.0",
-        "toys": "^1.0.0"
+        "knex": "^0.13.0"
     },
     "peerDependencies": {
         "hapi": ">=10 <17"
