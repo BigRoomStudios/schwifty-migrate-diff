@@ -11,12 +11,12 @@ Schwifty registers an hpal command called `migrate` that will detect where your 
 The command receives 3 options separated by spaces like normal bash commands. The signature:
 
 ```
-npx hpal run schwifty:migrate [migrationMode] [fileName] [migrationsDir]
+npx hpal run schwifty:migrate [mode] [migrationName] [migrationsDir]
 ```
 
 Where:
-  - `[migrationMode]` can be either `create` or `alter`, defaults to create
-  - `[fileName]` will affect the name of the generated migration file -- useful for describing what changes were made in a migration, like a mini commit message. Defaults to schwifty_migration
+  - `[mode]` can be either `create` or `alter`, defaults to create
+  - `[migrationName]` will affect the name of the generated migration file -- useful for describing what changes were made in a migration, like a mini commit message. Defaults to schwifty_migration
   - `[migrationsDir]` specifies a migrationsDir. Defaults to the closest one we're able to find in the project's root, errors if none can be found
 
 NOTE: **_schwifty-migration will only generate a migration file, it does not run migrations with Knex_** (applying these changes to your tables) -- that will happen depending on your settings with schwifty -- `options.migrateOnStart`
