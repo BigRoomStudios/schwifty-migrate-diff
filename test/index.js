@@ -495,7 +495,7 @@ describe('SchwiftyMigration', () => {
                         };
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person_Movie" ADD COLUMN weirdo_mysql_column SET';
+                        rawQuery = 'ALTER TABLE Person_Movie ADD weirdo_mysql_column SET("a", "b", "c")';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.MIGRATION,
                             file: 'truthy',
@@ -572,7 +572,7 @@ describe('SchwiftyMigration', () => {
                         };
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person_Movie" ADD COLUMN weirdo_mysql_column SET';
+                        rawQuery = 'ALTER TABLE Person_Movie ADD weirdo_mysql_column SET("a", "b", "c")';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
@@ -649,7 +649,7 @@ describe('SchwiftyMigration', () => {
                         };
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE "Person_Movie" ADD COLUMN weirdo_mysql_column SET';
+                        rawQuery = 'ALTER TABLE Person_Movie ADD weirdo_mysql_column SET("a", "b", "c")';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
