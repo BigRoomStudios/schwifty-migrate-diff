@@ -27,8 +27,6 @@ const internals = {};
 
 internals.cleanup = (session, done) => {
 
-    // Wipe the db!
-
     if (!session) {
         return done();
     }

@@ -1,7 +1,7 @@
 {
     "name": "schwifty-migration",
     "version": "0.0.3",
-    "description": "A hapi plugin to aid migration for schwifty models",
+    "description": "An Objection.js model migration tool for use during development",
     "main": "lib/index.js",
     "scripts": {
         "test": "lab -a code -t 100 --timeout 3000 -L -I '__core-js_shared__,SharedArrayBuffer,Atomics'",
