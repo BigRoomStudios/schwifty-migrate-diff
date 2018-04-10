@@ -199,7 +199,7 @@ describe('SchwiftyMigration', () => {
 
                         expect(err).to.not.exist();
 
-                        expect(Utils.compareOutput(output, {
+                        expect(Utils.validateOutput(output, {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
                             skippedColumns: []
@@ -237,7 +237,7 @@ describe('SchwiftyMigration', () => {
 
                 expect(err).to.not.exist();
 
-                expect(Utils.compareOutput(output, {
+                expect(Utils.validateOutput(output, {
                     code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                     file: null,
                     skippedColumns: []
@@ -319,7 +319,7 @@ describe('SchwiftyMigration', () => {
 
                 expect(err).to.not.exist();
 
-                expect(Utils.compareOutput(output, {
+                expect(Utils.validateOutput(output, {
                     code: SchwiftyMigration.returnCodes.MIGRATION,
                     file: 'truthy',
                     skippedColumns: []
@@ -537,7 +537,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(Utils.compareOutput(output, expectedOutput)).to.equal(true);
+                                expect(Utils.validateOutput(output, expectedOutput)).to.equal(true);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {
@@ -614,7 +614,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(Utils.compareOutput(output, expectedOutput)).to.equal(true);
+                                expect(Utils.validateOutput(output, expectedOutput)).to.equal(true);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {
@@ -694,7 +694,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(Utils.compareOutput(output, expectedOutput)).to.equal(true);
+                                expect(Utils.validateOutput(output, expectedOutput)).to.equal(true);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {

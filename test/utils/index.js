@@ -6,7 +6,7 @@ const Promise = require('bluebird');
 
 module.exports = {
 
-    compareOutput: (output, expectedOutput) => {
+    validateOutput: (output, expectedOutput) => {
 
         if (output.code !== expectedOutput.code) {
             return false;

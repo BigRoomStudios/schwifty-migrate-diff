@@ -101,7 +101,7 @@ module.exports = class TestRunner {
                                 // Ensure the migration matches expected
                                 expect(actualMigrationContents).to.equal(expectedMigrationContents);
 
-                                expect(utils.compareOutput(output, {
+                                expect(utils.validateOutput(output, {
                                     code: SchwiftyMigration.returnCodes.MIGRATION,
                                     file: 'truthy',
                                     skippedColumns: []
@@ -142,7 +142,7 @@ module.exports = class TestRunner {
                                                 return done(err);
                                             }
 
-                                            expect(utils.compareOutput(noMigrationNeededOutput, {
+                                            expect(utils.validateOutput(noMigrationNeededOutput, {
                                                 code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                                                 file: null,
                                                 skippedColumns: []
@@ -174,7 +174,7 @@ module.exports = class TestRunner {
                                                         return done(err);
                                                     }
 
-                                                    expect(utils.compareOutput(afterRollbackOutput, {
+                                                    expect(utils.validateOutput(afterRollbackOutput, {
                                                         code: SchwiftyMigration.returnCodes.MIGRATION,
                                                         file: 'truthy',
                                                         skippedColumns: []
