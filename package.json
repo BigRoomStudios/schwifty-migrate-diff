@@ -32,23 +32,22 @@
     },
     "homepage": "https://github.com/BigRoomStudios/schwifty-migration#readme",
     "dependencies": {
-        "handlebars": "^4.0.8",
-        "hoek": "^5.0.3",
-        "items": "^2.1.1",
-        "joi": "^13.0.1",
-        "jsondiffpatch": "^0.2.4"
+        "handlebars": "4.x.x",
+        "hoek": "5.x.x",
+        "items": "2.x.x",
+        "joi": "13.x.x",
+        "jsondiffpatch": "0.2.x"
     },
     "devDependencies": {
         "code": "4.x.x",
-        "coveralls": "^2.11.15",
-        "eslint": "^3.12.2",
-        "glue": "^4.1.0",
-        "knex": "^0.13.0",
-        "lab": "^14.3.1",
-        "lodash": "^4.17.4",
-        "mysql": "^2.13.0",
-        "objection": "^1.1.7",
-        "pg": "^6.2.2",
-        "schwifty": "^4.0.0"
+        "coveralls": "2.x.x",
+        "eslint": "3.x.x",
+        "glue": "4.x.x",
+        "knex": "0.13.x",
+        "lab": "14.x.x",
+        "mysql": "2.13.x",
+        "objection": "1.1.x",
+        "pg": "6.x.x",
+        "schwifty": "4.x.x"
     }
 }

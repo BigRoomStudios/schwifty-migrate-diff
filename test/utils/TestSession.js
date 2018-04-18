@@ -1,6 +1,5 @@
 'use strict';
 
-const _ = require('lodash');
 const Path = require('path');
 const { Promise } = require('objection');
 const Knex = require('knex');
@@ -134,7 +133,7 @@ function registerUnhandledRejectionHandler() { // eslint-disable-line
 
     Promise.onPossiblyUnhandledRejection((err) => {
 
-        if (_.isEmpty(TestSession.unhandledRejectionHandlers)) {
+        if (TestSession.unhandledRejectionHandlers.length === 0) {
             console.error(err.stack);
         }
 
