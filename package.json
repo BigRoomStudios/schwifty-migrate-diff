@@ -28,9 +28,9 @@
     "author": "William Woodruff <bill@bigroomstudios.com>",
     "license": "MIT",
     "bugs": {
-        "url": "https://github.com/BigRoomStudios/schwifty-migration/issues"
+        "url": "https://github.com/BigRoomStudios/schwifty-migrate-diff/issues"
     },
-    "homepage": "https://github.com/BigRoomStudios/schwifty-migration#readme",
+    "homepage": "https://github.com/BigRoomStudios/schwifty-migrate-diff#readme",
     "dependencies": {
         "handlebars": "4.x.x",
         "hoek": "5.x.x",
