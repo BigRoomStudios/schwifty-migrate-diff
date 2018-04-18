@@ -3,5 +3,5 @@ node_modules/*
 npm-debug*
 package-lock.json
 .DS_Store
-
+package-lock.json
 test/migration-tests/**/migrations/**/*.js

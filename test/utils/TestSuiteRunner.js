@@ -72,7 +72,11 @@ module.exports = class TestRunner {
                             done();
                         });
 
-                        const dbInitialized = () => {
+                        const dbInitialized = (err) => {
+
+                            if (err) {
+                                return done(err);
+                            }
 
                             const testModels = this.getModels(Path.join(testPath, 'models'), session);
 
@@ -199,7 +203,7 @@ module.exports = class TestRunner {
                                 .asCallback((err) => {
 
                                     if (err) {
-                                        return Promise.reject(err);
+                                        return dbInitialized(err);
                                     }
 
                                     dbInitialized();

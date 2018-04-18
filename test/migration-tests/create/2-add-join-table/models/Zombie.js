@@ -22,8 +22,8 @@ module.exports = class Zombie extends Model {
     static get relationMappings() {
 
         return {
-            oldIdentity: {
-                relation: Model.BelongsToOneRelation,
+            oldFriends: {
+                relation: Model.ManyToManyRelation,
                 modelClass: require('./Person'),
                 join: {
                     from: 'Zombie.id',

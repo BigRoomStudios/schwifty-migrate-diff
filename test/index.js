@@ -15,7 +15,6 @@ const TestSession = require('./utils/TestSession');
 const TestSuiteRunner = require('./utils/TestSuiteRunner');
 const SchwiftyMigration = require('../lib');
 const Mappings = require('../lib/mappings');
-const Promise = require('bluebird');
 
 // Test shortcuts
 
@@ -88,7 +87,7 @@ internals.failKnexWith = (knex, toErrorOn, errMsg, afterTries) => {
         qb[toErrorOn] = (...args) => {
 
             if (--afterTries === 0) {
-                return Promise.reject(new Error(errMsg));
+                return knex.Promise.reject(new Error(errMsg));
             }
             return origToErrorFunc(...args);
         };
@@ -339,7 +338,7 @@ describe('SchwiftyMigration', () => {
         }, (err) => {
 
             expect(err).to.exist();
-            expect(err.message).to.equal('Bad options passed to schwifty-migration: child \"migrationsDir\" fails because [\"migrationsDir\" is required]');
+            expect(err.message).to.equal('Bad options passed to schwifty-migrate-diff: child \"migrationsDir\" fails because [\"migrationsDir\" is required]');
             done();
         });
     });
@@ -426,7 +425,7 @@ describe('SchwiftyMigration', () => {
 
             internals.testUtils.setupCleanup(onCleanup, session);
 
-            // The first time schwifty-migration uses `select` is when pinging the
+            // The first time schwifty-migrate-diff uses `select` is when pinging the
             // db for general connectivity. The next time it uses `select` will be
             // when pinging for each table's existance in the db
 

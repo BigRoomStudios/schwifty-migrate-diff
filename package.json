@@ -1,5 +1,5 @@
 {
-    "name": "schwifty-migration",
+    "name": "schwifty-migrate-diff",
     "version": "0.0.3",
     "description": "An Objection.js model migration tool for use during development",
     "main": "lib/index.js",
@@ -11,7 +11,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/BigRoomStudios/schwifty-migration.git"
+        "url": "git+https://github.com/BigRoomStudios/schwifty-migrate-diff.git"
     },
     "engines": {
         "node": ">=4.0.0"
@@ -36,24 +36,19 @@
         "hoek": "^5.0.3",
         "items": "^2.1.1",
         "joi": "^13.0.1",
-        "jsondiffpatch": "^0.2.4",
-        "knex": "^0.13.0"
-    },
-    "peerDependencies": {
-        "hapi": ">=10 <17"
+        "jsondiffpatch": "^0.2.4"
     },
     "devDependencies": {
-        "bluebird": "^3.5.1",
         "code": "4.x.x",
         "coveralls": "^2.11.15",
         "eslint": "^3.12.2",
         "glue": "^4.1.0",
-        "hapi": "^16.1.0",
+        "knex": "^0.13.0",
         "lab": "^14.3.1",
         "lodash": "^4.17.4",
         "mysql": "^2.13.0",
-        "objection": "^0.8.9",
+        "objection": "^1.1.7",
         "pg": "^6.2.2",
-        "schwifty": "^2.0.0"
+        "schwifty": "^4.0.0"
     }
 }
