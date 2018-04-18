@@ -14,8 +14,8 @@ env:
   - DB=mysql
 
 before_script:
-  - psql -U postgres -c 'CREATE DATABASE schwifty_migration_test;'
-  - mysql -e 'CREATE DATABASE schwifty_migration_test'
+  - psql -U postgres -c 'CREATE DATABASE schwifty_migrate_diff_test;'
+  - mysql -e 'CREATE DATABASE schwifty_migrate_diff_test'
   # Wait for mysql service to respond
   - which mysql && until mysql -u root -e "show status" &>/dev/null; do sleep 1; done
 

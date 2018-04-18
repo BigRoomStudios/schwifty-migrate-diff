@@ -8,14 +8,14 @@ module.exports = [
         client: 'sqlite3',
         useNullAsDefault: true,
         connection: {
-            filename: Path.join(Os.tmpdir(), 'schwifty_migration_test.db')
+            filename: Path.join(Os.tmpdir(), 'schwifty_migrate_diff_test.db')
         }
     }, {
         client: 'mysql',
         connection: {
             host: '127.0.0.1',
             user: 'root',
-            database: 'schwifty_migration_test'
+            database: 'schwifty_migrate_diff_test'
         },
         pool: {
             afterCreate: (conn, cb) => {
@@ -32,7 +32,7 @@ module.exports = [
             host: '127.0.0.1',
             user: 'postgres',
             password: 'postgres',
-            database: 'schwifty_migration_test'
+            database: 'schwifty_migrate_diff_test'
         }
     }
 ];
