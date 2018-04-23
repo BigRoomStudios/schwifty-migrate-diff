@@ -9,7 +9,7 @@ Lead Maintainer - [William Woodruff](https://github.com/wswoodruff)
 ## Usage
 This package is used by [schwifty](https://github.com/hapipal/schwifty) to implement the `hpal run schwifty:migrate:diff` command
 
-Before being able to use the hpal command, run:
+Before being able to use the hpal command, run this in your project:
 ```
 npm install --save-dev schwifty-migrate-diff
 ```
