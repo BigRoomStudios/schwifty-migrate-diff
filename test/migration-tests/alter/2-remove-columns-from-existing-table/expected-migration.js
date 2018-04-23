@@ -8,7 +8,6 @@ exports.up = (knex, Promise) => {
             table.dropColumn('age');
             table.dropColumn('lastName');
         });
-
 };
 
 exports.down = (knex, Promise) => {
@@ -19,5 +18,4 @@ exports.down = (knex, Promise) => {
             table.integer('age');
             table.string('lastName');
         });
-
 };

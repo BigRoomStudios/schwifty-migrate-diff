@@ -27,7 +27,6 @@ exports.up = (knex, Promise) => {
             table.string('one-extra');
             table.string('two-extra');
         });
-
 };
 
 exports.down = (knex, Promise) => {
@@ -47,5 +46,4 @@ exports.down = (knex, Promise) => {
             table.dropColumn('one-extra');
             table.dropColumn('two-extra');
         });
-
 };

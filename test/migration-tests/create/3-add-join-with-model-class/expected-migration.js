@@ -22,7 +22,6 @@ exports.up = (knex, Promise) => {
             table.integer('personId');
             table.integer('movieId');
         });
-
 };
 
 exports.down = (knex, Promise) => {
@@ -31,5 +30,4 @@ exports.down = (knex, Promise) => {
         .dropTable('Movie')
         .dropTable('Person')
         .dropTable('Person_Movie');
-
 };

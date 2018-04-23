@@ -7,7 +7,6 @@ exports.up = (knex, Promise) => {
 
             table.string('hometown');
         });
-
 };
 
 exports.down = (knex, Promise) => {
@@ -17,5 +16,4 @@ exports.down = (knex, Promise) => {
 
             table.dropColumn('hometown');
         });
-
 };

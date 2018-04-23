@@ -12,12 +12,10 @@ exports.up = (knex, Promise) => {
             table.json('address');
             table.string('favoriteFood');
         });
-
 };
 
 exports.down = (knex, Promise) => {
 
     return knex.schema
         .dropTable('Zombie');
-
 };

@@ -6,7 +6,6 @@ exports.up = (knex, Promise) => {
 {{> build-table-create-list tableType='tableDelta'}}
 {{> build-table-create-list tableType='joinTableDelta'}}
 {{> build-column-modify-list}}
-
 };
 
 exports.down = (knex, Promise) => {
@@ -15,5 +14,4 @@ exports.down = (knex, Promise) => {
 {{> build-table-drop-list tableType='tableDelta'}}
 {{> build-table-drop-list tableType='joinTableDelta'}}
 {{> build-column-unmodify-list}}
-
 };

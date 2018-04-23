@@ -26,7 +26,6 @@ exports.up = (knex, Promise) => {
             table.string('three-extra');
             table.string('four-extra');
         });
-
 };
 
 exports.down = (knex, Promise) => {
@@ -35,5 +34,4 @@ exports.down = (knex, Promise) => {
         .dropTable('Movie')
         .dropTable('Person')
         .dropTable('Person_Movie');
-
 };

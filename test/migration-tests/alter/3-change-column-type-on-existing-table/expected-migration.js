@@ -8,7 +8,6 @@ exports.up = (knex, Promise) => {
             table.boolean('firstName').alter();
             table.float('lastName').alter();
         });
-
 };
 
 exports.down = (knex, Promise) => {
@@ -19,5 +18,4 @@ exports.down = (knex, Promise) => {
             table.string('firstName').alter();
             table.string('lastName').alter();
         });
-
 };
