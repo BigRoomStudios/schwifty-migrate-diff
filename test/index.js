@@ -148,7 +148,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/Dog')],
                 migrationsDir: absolutePath,
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.not.exist();
@@ -157,7 +157,7 @@ describe('SchwiftyMigration', () => {
                     models: [require('./migration-tests/Dog')],
                     migrationsDir: relativePath,
                     knex: session.knex,
-                    mode: 'alter'
+                    migrationName: 'test'
                 }, (err) => {
 
                     expect(err).to.not.exist();
@@ -193,7 +193,7 @@ describe('SchwiftyMigration', () => {
                         models: [require('./migration-tests/Person')],
                         migrationsDir,
                         knex: session.knex,
-                        mode: 'alter'
+                        migrationName: 'test'
                     }, (err, output) => {
 
                         expect(err).to.not.exist();
@@ -231,7 +231,7 @@ describe('SchwiftyMigration', () => {
                 models: [],
                 migrationsDir: 'some/path',
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err, output) => {
 
                 expect(err).to.not.exist();
@@ -247,7 +247,7 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('suppresses alter and drop actions if mode is not set to "alter"', (done, onCleanup) => {
+    it('suppresses alter and drop actions if mode is set to "create"', (done, onCleanup) => {
 
         internals.makeSession((err, session) => {
 
@@ -273,7 +273,8 @@ describe('SchwiftyMigration', () => {
                         models: [require('./migration-tests/AlterPerson')],
                         migrationsDir,
                         knex: session.knex,
-                        mode: 'create'
+                        mode: 'create',
+                        migrationName: 'test'
                     }, (err) => {
 
                         expect(err).to.not.exist();
@@ -313,7 +314,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/Dog')],
                 migrationsDir: absolutePath,
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err, output) => {
 
                 expect(err).to.not.exist();
@@ -377,7 +378,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/Dog')],
                 migrationsDir: absolutePath,
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -404,7 +405,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/Dog')],
                 migrationsDir: 'some/path',
                 knex: badKnex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -437,7 +438,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/Dog')],
                 migrationsDir: 'some/path',
                 knex: badKnex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -465,7 +466,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/Dog')],
                 migrationsDir: absoluteBadPath,
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -531,7 +532,7 @@ describe('SchwiftyMigration', () => {
                                 models: [require('./migration-tests/AlterPerson')],
                                 migrationsDir,
                                 knex: session.knex,
-                                mode: 'alter'
+                                migrationName: 'test'
                             }, (err, output) => {
 
                                 expect(err).to.not.exist();
@@ -608,7 +609,7 @@ describe('SchwiftyMigration', () => {
                                 models: [require('./migration-tests/Person')],
                                 migrationsDir,
                                 knex: session.knex,
-                                mode: 'alter'
+                                migrationName: 'test'
                             }, (err, output) => {
 
                                 expect(err).to.not.exist();
@@ -688,7 +689,7 @@ describe('SchwiftyMigration', () => {
                                 ],
                                 migrationsDir,
                                 knex: session.knex,
-                                mode: 'alter'
+                                migrationName: 'test'
                             }, (err, output) => {
 
                                 expect(err).to.not.exist();
@@ -725,7 +726,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/BadPerson')],
                 migrationsDir: absolutePath,
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -751,7 +752,7 @@ describe('SchwiftyMigration', () => {
                 models: [require('./migration-tests/Dog')],
                 migrationsDir: 'some/path',
                 knex: badKnex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -782,7 +783,7 @@ describe('SchwiftyMigration', () => {
                 ],
                 migrationsDir: 'some/path',
                 knex: badKnex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -813,7 +814,7 @@ describe('SchwiftyMigration', () => {
                 ],
                 migrationsDir: absolutePath,
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -844,7 +845,7 @@ describe('SchwiftyMigration', () => {
                 ],
                 migrationsDir: absolutePath,
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();
@@ -874,7 +875,7 @@ describe('SchwiftyMigration', () => {
                 ],
                 migrationsDir: absolutePath,
                 knex: session.knex,
-                mode: 'alter'
+                migrationName: 'test'
             }, (err) => {
 
                 expect(err).to.exist();

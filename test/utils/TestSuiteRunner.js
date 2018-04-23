@@ -84,7 +84,6 @@ module.exports = class TestRunner {
                                 models: testModels,
                                 migrationsDir,
                                 knex: session.knex,
-                                mode: 'alter',
                                 migrationName: `it-${itText.split(' ').join('-')}`
                             }, (err, output) => {
 
@@ -139,7 +138,7 @@ module.exports = class TestRunner {
                                             models: testModels,
                                             migrationsDir,
                                             knex: session.knex,
-                                            mode: 'alter'
+                                            migrationName: 'test'
                                         }, (err, noMigrationNeededOutput) => {
 
                                             if (err) {
@@ -170,7 +169,6 @@ module.exports = class TestRunner {
                                                     models: testModels,
                                                     migrationsDir,
                                                     knex: session.knex,
-                                                    mode: 'alter',
                                                     migrationName: 'after-rollback'
                                                 }, (err, afterRollbackOutput) => {
 
