@@ -3,7 +3,7 @@
 exports.up = (knex, Promise) => {
 
     return knex.schema
-        .createTableIfNotExists('Person', (table) => {
+        .createTable('Person', (table) => {
 
             table.integer('id');
             table.string('firstName');
@@ -11,13 +11,13 @@ exports.up = (knex, Promise) => {
             table.integer('age');
             table.json('address');
         })
-        .createTableIfNotExists('Movie', (table) => {
+        .createTable('Movie', (table) => {
 
             table.float('id');
             table.string('title');
             table.string('subTitle');
         })
-        .createTableIfNotExists('Person_Movie', (table) => {
+        .createTable('Person_Movie', (table) => {
 
             table.string('personId');
             table.string('movieId');

@@ -3,7 +3,7 @@
 exports.up = function (knex, Promise) {
 
     return knex.schema
-        .createTableIfNotExists('Person', (table) => {
+        .createTable('Person', (table) => {
 
             table.string('firstName');
             table.integer('id');
