@@ -1,3 +1,3 @@
     {{#each (keyFromObject 'create' (keyFromObject tableType @root.tableDeltas))}}
-        .dropTable('{{this}}'){{tableMaybeSemi 'drop' this @root.tableDeltas @root.columnDeltas ../tableType}}
+        .dropTable('{{this}}')
     {{/each}}

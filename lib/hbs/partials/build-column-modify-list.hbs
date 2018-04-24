@@ -12,7 +12,7 @@
             {{#each this.drop}}
             table.dropColumn('{{this.columnName}}');
             {{/each}}
-        }){{columnMaybeSemi 'alter' this @root.columnDeltas}}
+        })
 {{/if}}
 {{/if}}
 {{/each}}

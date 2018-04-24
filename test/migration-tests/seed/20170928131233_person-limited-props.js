@@ -11,12 +11,10 @@ exports.up = (knex, Promise) => {
             table.integer('age');
             table.json('address');
         });
-
 };
 
 exports.down = (knex, Promise) => {
 
     return knex.schema
         .dropTable('Person');
-
 };
