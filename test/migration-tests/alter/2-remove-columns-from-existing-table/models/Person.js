@@ -1,9 +1,9 @@
 'use strict';
 
 const Joi = require('joi');
-const Model = require('schwifty').Model;
+const Schwifty = require('schwifty');
 
-module.exports = class Person extends Model {
+module.exports = class Person extends Schwifty.Model {
 
     static get tableName() {
 

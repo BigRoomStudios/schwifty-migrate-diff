@@ -1,9 +1,9 @@
 'use strict';
 
 const Joi = require('joi');
-const Model = require('schwifty').Model;
+const Schwifty = require('schwifty');
 
-module.exports = class Movie extends Model {
+module.exports = class Movie extends Schwifty.Model {
 
     static get tableName() {
 
@@ -23,7 +23,7 @@ module.exports = class Movie extends Model {
 
         return {
             actors: {
-                relation: Model.ManyToManyRelation,
+                relation: Schwifty.Model.ManyToManyRelation,
                 modelClass: require('./Person'),
                 join: {
                     from: 'Person.id',
@@ -35,7 +35,7 @@ module.exports = class Movie extends Model {
                 }
             },
             dogActors: {
-                relation: Model.ManyToManyRelation,
+                relation: Schwifty.Model.ManyToManyRelation,
                 modelClass: require('./Dog'),
                 join: {
                     from: 'Dog.id',

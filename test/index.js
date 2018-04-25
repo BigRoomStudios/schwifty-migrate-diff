@@ -15,6 +15,7 @@ const TestSession = require('./utils/TestSession');
 const TestSuiteRunner = require('./utils/TestSuiteRunner');
 const SchwiftyMigration = require('../lib');
 const Mappings = require('../lib/mappings');
+const TestModels = require('./migration-tests/models');
 
 // Test shortcuts
 
@@ -37,7 +38,7 @@ internals.cleanup = (session, done) => {
             return done(err);
         }
 
-        const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+        const absolutePath = Path.join(__dirname, 'migration-tests/migrations');
 
         Fs.readdirSync(absolutePath)
             .forEach((migrationFile) => {
@@ -145,7 +146,7 @@ describe('SchwiftyMigration', () => {
             const relativePath = './test/migration-tests/migrations';
 
             SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/Dog')],
+                models: [TestModels.Dog],
                 migrationsDir: absolutePath,
                 knex: session.knex,
                 migrationName: 'test'
@@ -154,7 +155,7 @@ describe('SchwiftyMigration', () => {
                 expect(err).to.not.exist();
 
                 SchwiftyMigration.genMigrationFile({
-                    models: [require('./migration-tests/Dog')],
+                    models: [TestModels.Dog],
                     migrationsDir: relativePath,
                     knex: session.knex,
                     migrationName: 'test'
@@ -190,7 +191,7 @@ describe('SchwiftyMigration', () => {
                     }
 
                     SchwiftyMigration.genMigrationFile({
-                        models: [require('./migration-tests/Person')],
+                        models: [TestModels.Person],
                         migrationsDir,
                         knex: session.knex,
                         migrationName: 'test'
@@ -270,7 +271,7 @@ describe('SchwiftyMigration', () => {
                     }
 
                     SchwiftyMigration.genMigrationFile({
-                        models: [require('./migration-tests/AlterPerson')],
+                        models: [TestModels.AlterPerson],
                         migrationsDir,
                         knex: session.knex,
                         mode: 'create',
@@ -308,10 +309,10 @@ describe('SchwiftyMigration', () => {
 
             internals.testUtils.setupCleanup(onCleanup, session);
 
-            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+            const absolutePath = Path.join(__dirname, 'migration-tests/migrations');
 
             SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/Dog')],
+                models: [TestModels.Dog],
                 migrationsDir: absolutePath,
                 knex: session.knex,
                 migrationName: 'test'
@@ -372,10 +373,10 @@ describe('SchwiftyMigration', () => {
                 return origWriteFile.apply(this, args);
             };
 
-            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+            const absolutePath = Path.join(__dirname, 'migration-tests/migrations');
 
             SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/Dog')],
+                models: [TestModels.Dog],
                 migrationsDir: absolutePath,
                 knex: session.knex,
                 migrationName: 'test'
@@ -402,7 +403,7 @@ describe('SchwiftyMigration', () => {
             const badKnex = internals.failKnexWith(session.knex, 'select', 'Not pingable');
 
             SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/Dog')],
+                models: [TestModels.Dog],
                 migrationsDir: 'some/path',
                 knex: badKnex,
                 migrationName: 'test'
@@ -435,7 +436,7 @@ describe('SchwiftyMigration', () => {
             const badKnex = internals.failKnexWith(session.knex, 'select', 'Error when pinging table', 2);
 
             SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/Dog')],
+                models: [TestModels.Dog],
                 migrationsDir: 'some/path',
                 knex: badKnex,
                 migrationName: 'test'
@@ -460,10 +461,10 @@ describe('SchwiftyMigration', () => {
             internals.testUtils.setupCleanup(onCleanup, session);
 
             // Setting the migrations dir path to a file
-            const absoluteBadPath = Path.join(process.cwd(), 'test/migration-tests/Person.js');
+            const absoluteBadPath = Path.join(__dirname, 'migration-tests/models/Person.js');
 
             SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/Dog')],
+                models: [TestModels.Dog],
                 migrationsDir: absoluteBadPath,
                 knex: session.knex,
                 migrationName: 'test'
@@ -529,7 +530,7 @@ describe('SchwiftyMigration', () => {
                             }
 
                             SchwiftyMigration.genMigrationFile({
-                                models: [require('./migration-tests/AlterPerson')],
+                                models: [TestModels.AlterPerson],
                                 migrationsDir,
                                 knex: session.knex,
                                 migrationName: 'test'
@@ -606,7 +607,7 @@ describe('SchwiftyMigration', () => {
                             }
 
                             SchwiftyMigration.genMigrationFile({
-                                models: [require('./migration-tests/Person')],
+                                models: [TestModels.Person],
                                 migrationsDir,
                                 knex: session.knex,
                                 migrationName: 'test'
@@ -684,8 +685,8 @@ describe('SchwiftyMigration', () => {
 
                             SchwiftyMigration.genMigrationFile({
                                 models: [
-                                    require('./migration-tests/Person'),
-                                    require('./migration-tests/Movie')
+                                    TestModels.Person,
+                                    TestModels.Movie
                                 ],
                                 migrationsDir,
                                 knex: session.knex,
@@ -720,10 +721,10 @@ describe('SchwiftyMigration', () => {
 
             internals.testUtils.setupCleanup(onCleanup, session);
 
-            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+            const absolutePath = Path.join(__dirname, 'migration-tests/migrations');
 
             SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/BadPerson')],
+                models: [TestModels.BadPerson],
                 migrationsDir: absolutePath,
                 knex: session.knex,
                 migrationName: 'test'
@@ -749,7 +750,7 @@ describe('SchwiftyMigration', () => {
             const badKnex = internals.failKnexWith(session.knex, 'columnInfo', 'Column info fail regular model');
 
             SchwiftyMigration.genMigrationFile({
-                models: [require('./migration-tests/Dog')],
+                models: [TestModels.Dog],
                 migrationsDir: 'some/path',
                 knex: badKnex,
                 migrationName: 'test'
@@ -777,9 +778,9 @@ describe('SchwiftyMigration', () => {
 
             SchwiftyMigration.genMigrationFile({
                 models: [
-                    require('./migration-tests/Person'),
-                    require('./migration-tests/Movie'),
-                    require('./migration-tests/Person_Movie')
+                    TestModels.Person,
+                    TestModels.Movie,
+                    TestModels.Person_Movie
                 ],
                 migrationsDir: 'some/path',
                 knex: badKnex,
@@ -804,13 +805,13 @@ describe('SchwiftyMigration', () => {
 
             internals.testUtils.setupCleanup(onCleanup, session);
 
-            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+            const absolutePath = Path.join(__dirname, 'migration-tests/migrations');
 
             SchwiftyMigration.genMigrationFile({
                 models: [
-                    require('./migration-tests/Person'),
-                    require('./migration-tests/BadMovie'),
-                    require('./migration-tests/Bad_Person_Movie')
+                    TestModels.Person,
+                    TestModels.BadMovie,
+                    TestModels.Bad_Person_Movie
                 ],
                 migrationsDir: absolutePath,
                 knex: session.knex,
@@ -835,13 +836,13 @@ describe('SchwiftyMigration', () => {
 
             internals.testUtils.setupCleanup(onCleanup, session);
 
-            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+            const absolutePath = Path.join(__dirname, 'migration-tests/migrations');
 
             SchwiftyMigration.genMigrationFile({
                 models: [
-                    require('./migration-tests/Person'),
-                    require('./migration-tests/DoubleBadMovie'),
-                    require('./migration-tests/Double_Bad_Person_Movie')
+                    TestModels.Person,
+                    TestModels.DoubleBadMovie,
+                    TestModels.Double_Bad_Person_Movie
                 ],
                 migrationsDir: absolutePath,
                 knex: session.knex,
@@ -866,12 +867,12 @@ describe('SchwiftyMigration', () => {
 
             internals.testUtils.setupCleanup(onCleanup, session);
 
-            const absolutePath = Path.join(process.cwd(), 'test/migration-tests/migrations');
+            const absolutePath = Path.join(__dirname, 'migration-tests/migrations');
 
             SchwiftyMigration.genMigrationFile({
                 models: [
-                    require('./migration-tests/BadPerson'),
-                    require('./migration-tests/BadZombie')
+                    TestModels.BadPerson,
+                    TestModels.BadZombie
                 ],
                 migrationsDir: absolutePath,
                 knex: session.knex,

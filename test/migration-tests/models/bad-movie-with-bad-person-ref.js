@@ -2,6 +2,7 @@
 
 const Joi = require('joi');
 const Model = require('schwifty').Model;
+const TestModels = require('./');
 
 module.exports = class BadMovieWithBadPersonRef extends Model {
 
@@ -28,13 +29,13 @@ module.exports = class BadMovieWithBadPersonRef extends Model {
         return {
             actors: {
                 relation: Model.ManyToManyRelation,
-                modelClass: require('./BadPerson'),
+                modelClass: TestModels.BadPerson,
                 join: {
                     from: 'BadPerson.id',
                     through: {
                         from: 'Person_Movie.personId',
                         to: 'Person_Movie.movieId',
-                        modelClass: require('./Person_Movie')
+                        modelClass: TestModels.Person_Movie
                     },
                     to: 'BadMovieWithBadPersonRef.id'
                 }

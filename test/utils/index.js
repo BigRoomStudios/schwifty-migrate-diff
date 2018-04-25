@@ -47,6 +47,7 @@ module.exports = {
             'DoubleBadMovie',
             'Movie',
             'Person_Movie',
+            'Person_Zombie',
             'Dog_Movie',
             'Person',
             'Zombie',

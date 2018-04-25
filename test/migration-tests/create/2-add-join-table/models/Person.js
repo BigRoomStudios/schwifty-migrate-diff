@@ -1,9 +1,9 @@
 'use strict';
 
 const Joi = require('joi');
-const Model = require('schwifty').Model;
+const Schwifty = require('schwifty');
 
-module.exports = class Person extends Model {
+module.exports = class Person extends Schwifty.Model {
 
     static get tableName() {
 
@@ -25,5 +25,23 @@ module.exports = class Person extends Model {
                 zipCode: Joi.string()
             })
         });
+    }
+
+    static get relationMappings() {
+
+        return {
+            newFriends: {
+                relation: Schwifty.Model.ManyToManyRelation,
+                modelClass: require('./Zombie'),
+                join: {
+                    from: 'Zombie.id',
+                    through: {
+                        from: 'Person_Zombie.zombieId',
+                        to: 'Person_Zombie.personId'
+                    },
+                    to: 'Person.id'
+                }
+            }
+        };
     }
 };

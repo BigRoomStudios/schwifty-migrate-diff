@@ -1,9 +1,9 @@
 'use strict';
 
 const Joi = require('joi');
-const Model = require('schwifty').Model;
+const Schwifty = require('schwifty');
 
-module.exports = class Dog extends Model {
+module.exports = class Dog extends Schwifty.Model {
 
     static get tableName() {
 
@@ -24,7 +24,7 @@ module.exports = class Dog extends Model {
 
         return {
             owner: {
-                relation: Model.BelongsToOneRelation,
+                relation: Schwifty.Model.BelongsToOneRelation,
                 modelClass: require('./Person'),
                 join: {
                     from: 'Person.id',

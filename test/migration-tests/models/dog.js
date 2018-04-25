@@ -2,6 +2,7 @@
 
 const Joi = require('joi');
 const Model = require('schwifty').Model;
+const TestModels = require('./');
 
 module.exports = class Dog extends Model {
 
@@ -25,7 +26,7 @@ module.exports = class Dog extends Model {
         return {
             owner: {
                 relation: Model.BelongsToOneRelation,
-                modelClass: require('./Person'),
+                modelClass: TestModels.Person,
                 join: {
                     from: 'Person.id',
                     to: 'Dog.ownerId'
