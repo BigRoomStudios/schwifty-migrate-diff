@@ -461,7 +461,7 @@ describe('SchwiftyMigration', () => {
             internals.testUtils.setupCleanup(onCleanup, session);
 
             // Setting the migrations dir path to a file
-            const absoluteBadPath = Path.join(__dirname, 'migration-tests/models/Person.js');
+            const absoluteBadPath = Path.join(__dirname, 'migration-tests/models/person.js');
 
             SchwiftyMigration.genMigrationFile({
                 models: [TestModels.Dog],
