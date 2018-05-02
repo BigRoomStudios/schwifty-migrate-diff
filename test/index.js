@@ -47,7 +47,7 @@ internals.cleanup = (session, done) => {
                 Fs.unlinkSync(filePath);
             });
 
-        session.knex.destroy().asCallback(done);
+        session.knex.destroy().then(() => done(), done);
     });
 };
 
@@ -127,7 +127,7 @@ describe('SchwiftyMigration', () => {
                 if (err) {
                     return done(err);
                 }
-                session.knex.destroy().asCallback(done);
+                session.knex.destroy().then(() => done(), done);
             });
         });
     });
