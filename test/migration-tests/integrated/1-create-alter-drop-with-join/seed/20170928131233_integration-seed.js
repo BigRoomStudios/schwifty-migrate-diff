@@ -21,7 +21,6 @@ exports.up = function (knex, Promise) {
             table.integer('movieId');
             table.integer('seeded-extra');
         });
-
 };
 
 exports.down = function (knex, Promise) {
@@ -29,5 +28,4 @@ exports.down = function (knex, Promise) {
     return knex.schema
         .dropTable('Person')
         .dropTable('Movie');
-
 };

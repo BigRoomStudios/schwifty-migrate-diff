@@ -11,6 +11,7 @@ const Code = require('code');
 const Hoek = require('hoek');
 
 const KnexConfigs = require('./knexfile');
+const Utils = require('./utils');
 const TestSession = require('./utils/TestSession');
 const TestSuiteRunner = require('./utils/TestSuiteRunner');
 const SchwiftyMigration = require('../lib');
@@ -22,7 +23,6 @@ const TestModels = require('./migration-tests/models');
 const lab = exports.lab = Lab.script({ schedule: false });
 const expect = Code.expect;
 const { describe, it, before } = lab;
-const Utils = require('./utils');
 
 const internals = {};
 
