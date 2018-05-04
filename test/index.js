@@ -199,11 +199,11 @@ describe('SchwiftyMigration', () => {
 
                         expect(err).to.not.exist();
 
-                        expect(Utils.validateOutput(output, {
+                        Utils.validateOutput(output, {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
                             skippedColumns: []
-                        })).to.equal(true);
+                        });
 
                         Fs.readdirSync(migrationsDir)
                             .forEach((migrationFile) => {
@@ -237,11 +237,11 @@ describe('SchwiftyMigration', () => {
 
                 expect(err).to.not.exist();
 
-                expect(Utils.validateOutput(output, {
+                Utils.validateOutput(output, {
                     code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                     file: null,
                     skippedColumns: []
-                })).to.equal(true);
+                });
 
                 done();
             });
@@ -320,11 +320,11 @@ describe('SchwiftyMigration', () => {
 
                 expect(err).to.not.exist();
 
-                expect(Utils.validateOutput(output, {
+                Utils.validateOutput(output, {
                     code: SchwiftyMigration.returnCodes.MIGRATION,
-                    file: 'truthy',
+                    file: 'test',
                     skippedColumns: []
-                })).to.equal(true);
+                });
 
                 done();
             });
@@ -506,16 +506,20 @@ describe('SchwiftyMigration', () => {
                         rawQuery = 'ALTER TABLE "Person" ADD weirdo_psql_column polygon';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.MIGRATION,
-                            file: 'truthy',
-                            skippedColumns: ['polygon']
+                            file: 'test',
+                            skippedColumns: [
+                                { tableName: 'Person', column: 'weirdo_psql_column', type: 'polygon' }
+                            ]
                         };
                     }
                     else if (session.isMySql()) {
                         rawQuery = 'ALTER TABLE Person ADD weirdo_mysql_column SET("a", "b", "c")';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.MIGRATION,
-                            file: 'truthy',
-                            skippedColumns: ['set']
+                            file: 'test',
+                            skippedColumns: [
+                                { tableName: 'Person', column: 'weirdo_mysql_column', type: 'set' }
+                            ]
                         };
                     }
                     else {
@@ -538,7 +542,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(Utils.validateOutput(output, expectedOutput)).to.equal(true);
+                                Utils.validateOutput(output, expectedOutput);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {
@@ -584,7 +588,9 @@ describe('SchwiftyMigration', () => {
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
-                            skippedColumns: ['polygon']
+                            skippedColumns: [
+                                { tableName: 'Person', column: 'weirdo_psql_column', type: 'polygon' }
+                            ]
                         };
                     }
                     else if (session.isMySql()) {
@@ -592,7 +598,9 @@ describe('SchwiftyMigration', () => {
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
-                            skippedColumns: ['set']
+                            skippedColumns: [
+                                { tableName: 'Person', column: 'weirdo_mysql_column', type: 'set' }
+                            ]
                         };
                     }
                     else {
@@ -615,7 +623,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(Utils.validateOutput(output, expectedOutput)).to.equal(true);
+                                Utils.validateOutput(output, expectedOutput);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {
@@ -661,7 +669,10 @@ describe('SchwiftyMigration', () => {
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
-                            skippedColumns: ['polygon', 'polygon']
+                            skippedColumns: [
+                                { tableName: 'Person_Movie', column: 'weirdo_psql_column', type: 'polygon' },
+                                { tableName: 'Person', column: 'weirdo_psql_column', type: 'polygon' }
+                            ]
                         };
                     }
                     else if (session.isMySql()) {
@@ -669,7 +680,10 @@ describe('SchwiftyMigration', () => {
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
-                            skippedColumns: ['set', 'set']
+                            skippedColumns: [
+                                { tableName: 'Person_Movie', column: 'weirdo_mysql_column', type: 'set' },
+                                { tableName: 'Person', column: 'weirdo_mysql_column', type: 'set' }
+                            ]
                         };
                     }
                     else {
@@ -695,7 +709,7 @@ describe('SchwiftyMigration', () => {
 
                                 expect(err).to.not.exist();
 
-                                expect(Utils.validateOutput(output, expectedOutput)).to.equal(true);
+                                Utils.validateOutput(output, expectedOutput);
 
                                 Fs.readdirSync(migrationsDir)
                                     .forEach((migrationFile) => {

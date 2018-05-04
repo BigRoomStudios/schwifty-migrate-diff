@@ -3,26 +3,18 @@
 const Fs = require('fs');
 const Path = require('path');
 const Promise = require('bluebird');
+const Code = require('code');
 
 module.exports = {
 
     validateOutput: (output, expectedOutput) => {
 
-        if (output.code !== expectedOutput.code) {
-            return false;
-        }
+        const { expect } = Code;
 
-        if (String(output.skippedColumns) !== String(expectedOutput.skippedColumns)) {
-            return false;
-        }
-
-        // Just check if this is truthy or not -- we don't know the timestamp
-        // Knex is going to assign to the filename
-        if (Boolean(output.file) !== Boolean(expectedOutput.file)) {
-            return false;
-        }
-
-        return true;
+        expect(output).to.exist();
+        expect(output.code).to.equal(expectedOutput.code);
+        expect(output.skippedColumns).to.equal(expectedOutput.skippedColumns);
+        output.file && expect(output.file).to.endWith(`${expectedOutput.file}.js`);
     },
 
     wipeDb: (session, done) => {
