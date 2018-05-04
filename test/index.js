@@ -657,19 +657,19 @@ describe('SchwiftyMigration', () => {
                     let expectedOutput;
 
                     if (session.isPostgres()) {
-                        rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_psql_column polygon';
+                        rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_psql_column polygon; ALTER TABLE "Person" ADD weirdo_psql_column polygon;';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
-                            skippedColumns: ['polygon']
+                            skippedColumns: ['polygon', 'polygon']
                         };
                     }
                     else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE Person_Movie ADD weirdo_mysql_column SET("a", "b", "c")';
+                        rawQuery = 'ALTER TABLE Person_Movie ADD weirdo_mysql_column SET("a", "b", "c"); ALTER TABLE Person ADD weirdo_mysql_column SET("a", "b", "c")';
                         expectedOutput = {
                             code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                             file: null,
-                            skippedColumns: ['set']
+                            skippedColumns: ['set', 'set']
                         };
                     }
                     else {

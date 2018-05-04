@@ -12,7 +12,7 @@ module.exports = {
             return false;
         }
 
-        if (String(output.skippedCols) !== String(expectedOutput.skippedCols)) {
+        if (String(output.skippedColumns) !== String(expectedOutput.skippedColumns)) {
             return false;
         }
 
