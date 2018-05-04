@@ -14,7 +14,7 @@
     "url": "git+https://github.com/BigRoomStudios/schwifty-migrate-diff.git"
   },
   "engines": {
-      "node": ">=8.x.x"
+    "node": ">=8.x.x"
   },
   "keywords": [
     "hapi",
