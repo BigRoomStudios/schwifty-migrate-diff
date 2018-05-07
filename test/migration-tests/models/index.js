@@ -12,4 +12,5 @@ exports.DoubleBadMovie = require('./double-bad-movie');
 exports.Movie = require('./movie');
 exports.Person_Movie = require('./person-movie');
 exports.Person = require('./person');
+exports.WeirdoPerson = require('./weirdo-person');
 exports.Zombie = require('./zombie');

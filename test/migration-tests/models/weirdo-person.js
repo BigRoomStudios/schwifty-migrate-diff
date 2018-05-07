@@ -27,7 +27,8 @@ module.exports = class AlterPerson extends Model {
                 zipCode: Joi.string()
             }),
 
-            hometown: Joi.string() // This will be the only thing reflected in the migration file
+            hometown: Joi.string(),
+            weirdo_column: Joi.string() // This conflicts with an unsupported (skipped) weirdo_column in the db
         });
     }
 };
