@@ -558,87 +558,6 @@ describe('SchwiftyMigration', () => {
         });
     });
 
-    it('informs user of conflict between a skipped db column and a Joi schema prop with the same name', (done, onCleanup) => {
-
-        internals.makeSession((err, session) => {
-
-            if (err) {
-                return done(err);
-            }
-
-            internals.testUtils.setupCleanup(onCleanup, session);
-
-            const migrationsDir = './test/migration-tests/migrations';
-            const seedPath = './test/migration-tests/seed';
-
-            session.knex.migrate.latest({
-                directory: seedPath
-            })
-                .asCallback((err) => {
-
-                    if (err) {
-                        return done(err);
-                    }
-
-                    let rawQuery;
-                    let expectedOutput;
-
-                    if (session.isPostgres()) {
-                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_column polygon';
-                        expectedOutput = {
-                            code: SchwiftyMigration.returnCodes.MIGRATION_WITH_CONFLICT,
-                            file: 'test',
-                            skippedColumns: [
-                                { tableName: 'Person', column: 'weirdo_column', type: 'polygon', schemaConflict: true }
-                            ]
-                        };
-                    }
-                    else if (session.isMySql()) {
-                        rawQuery = 'ALTER TABLE Person ADD weirdo_column SET("a", "b", "c")';
-                        expectedOutput = {
-                            code: SchwiftyMigration.returnCodes.MIGRATION_WITH_CONFLICT,
-                            file: 'test',
-                            skippedColumns: [
-                                { tableName: 'Person', column: 'weirdo_column', type: 'set', schemaConflict: true }
-                            ]
-                        };
-                    }
-                    else {
-                        return done(new Error('Db not supported'));
-                    }
-
-                    session.knex.raw(rawQuery)
-                        .asCallback((alterErr) => {
-
-                            if (alterErr) {
-                                return done(alterErr);
-                            }
-
-                            SchwiftyMigration.genMigrationFile({
-                                models: [TestModels.WeirdoPerson],
-                                migrationsDir,
-                                knex: session.knex,
-                                migrationName: 'test'
-                            }, (err, output) => {
-
-                                expect(err).to.not.exist();
-
-                                Utils.validateOutput(output, expectedOutput);
-
-                                Fs.readdirSync(migrationsDir)
-                                    .forEach((migrationFile) => {
-
-                                        const filePath = Path.join(migrationsDir, migrationFile);
-                                        Fs.unlinkSync(filePath);
-                                    });
-
-                                done();
-                            });
-                        });
-                });
-        });
-    });
-
     it('informs user of skipped unsupported db column types and no other changes', (done, onCleanup) => {
 
         internals.makeSession((err, session) => {
@@ -782,6 +701,171 @@ describe('SchwiftyMigration', () => {
                                 models: [
                                     TestModels.Person,
                                     TestModels.Movie
+                                ],
+                                migrationsDir,
+                                knex: session.knex,
+                                migrationName: 'test'
+                            }, (err, output) => {
+
+                                expect(err).to.not.exist();
+
+                                Utils.validateOutput(output, expectedOutput);
+
+                                Fs.readdirSync(migrationsDir)
+                                    .forEach((migrationFile) => {
+
+                                        const filePath = Path.join(migrationsDir, migrationFile);
+                                        Fs.unlinkSync(filePath);
+                                    });
+
+                                done();
+                            });
+                        });
+                });
+        });
+    });
+
+    it('informs user of a schema conflict between a skipped db column and a Joi schema prop with the same name', (done, onCleanup) => {
+
+        internals.makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
+
+            const migrationsDir = './test/migration-tests/migrations';
+            const seedPath = './test/migration-tests/seed';
+
+            session.knex.migrate.latest({
+                directory: seedPath
+            })
+                .asCallback((err) => {
+
+                    if (err) {
+                        return done(err);
+                    }
+
+                    let rawQuery;
+                    let expectedOutput;
+
+                    if (session.isPostgres()) {
+                        rawQuery = 'ALTER TABLE "Person" ADD weirdo_column polygon';
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.MIGRATION_WITH_CONFLICT,
+                            file: 'test',
+                            skippedColumns: [
+                                { tableName: 'Person', column: 'weirdo_column', type: 'polygon', schemaConflict: true }
+                            ]
+                        };
+                    }
+                    else if (session.isMySql()) {
+                        rawQuery = 'ALTER TABLE Person ADD weirdo_column SET("a", "b", "c")';
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.MIGRATION_WITH_CONFLICT,
+                            file: 'test',
+                            skippedColumns: [
+                                { tableName: 'Person', column: 'weirdo_column', type: 'set', schemaConflict: true }
+                            ]
+                        };
+                    }
+                    else {
+                        return done(new Error('Db not supported'));
+                    }
+
+                    session.knex.raw(rawQuery)
+                        .asCallback((alterErr) => {
+
+                            if (alterErr) {
+                                return done(alterErr);
+                            }
+
+                            SchwiftyMigration.genMigrationFile({
+                                models: [TestModels.WeirdoPerson],
+                                migrationsDir,
+                                knex: session.knex,
+                                migrationName: 'test'
+                            }, (err, output) => {
+
+                                expect(err).to.not.exist();
+
+                                Utils.validateOutput(output, expectedOutput);
+
+                                Fs.readdirSync(migrationsDir)
+                                    .forEach((migrationFile) => {
+
+                                        const filePath = Path.join(migrationsDir, migrationFile);
+                                        Fs.unlinkSync(filePath);
+                                    });
+
+                                done();
+                            });
+                        });
+                });
+        });
+    });
+
+    it('informs user of a schema conflict between a skipped db column and a Joi schema prop with the same name on a join table', (done, onCleanup) => {
+
+        internals.makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
+
+            const migrationsDir = './test/migration-tests/migrations';
+            const seedPath = './test/migration-tests/seed-join';
+
+            session.knex.migrate.latest({
+                directory: seedPath
+            })
+                .asCallback((err) => {
+
+                    if (err) {
+                        return done(err);
+                    }
+
+                    let rawQuery;
+                    let expectedOutput;
+
+                    if (session.isPostgres()) {
+                        rawQuery = 'ALTER TABLE "Person_Movie" ADD weirdo_column polygon';
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.MIGRATION_WITH_CONFLICT,
+                            file: 'test',
+                            skippedColumns: [
+                                { tableName: 'Person_Movie', column: 'weirdo_column', type: 'polygon', schemaConflict: true }
+                            ]
+                        };
+                    }
+                    else if (session.isMySql()) {
+                        rawQuery = 'ALTER TABLE Person_Movie ADD weirdo_column SET("a", "b", "c")';
+                        expectedOutput = {
+                            code: SchwiftyMigration.returnCodes.MIGRATION_WITH_CONFLICT,
+                            file: 'test',
+                            skippedColumns: [
+                                { tableName: 'Person_Movie', column: 'weirdo_column', type: 'set', schemaConflict: true }
+                            ]
+                        };
+                    }
+                    else {
+                        return done(new Error('Db not supported'));
+                    }
+
+                    session.knex.raw(rawQuery)
+                        .asCallback((alterErr) => {
+
+                            if (alterErr) {
+                                return done(alterErr);
+                            }
+
+                            SchwiftyMigration.genMigrationFile({
+                                models: [
+                                    TestModels.Person,
+                                    TestModels.MovieWithWeirdoJoin
                                 ],
                                 migrationsDir,
                                 knex: session.knex,

@@ -27,5 +27,6 @@ exports.down = function (knex, Promise) {
 
     return knex.schema
         .dropTable('Person')
-        .dropTable('Movie');
+        .dropTable('Movie')
+        .dropTable('Dog_Movie');
 };

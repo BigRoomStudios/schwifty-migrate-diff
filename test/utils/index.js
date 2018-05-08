@@ -14,7 +14,7 @@ module.exports = {
         expect(output).to.exist();
         expect(output.code).to.equal(expectedOutput.code);
         expect(output.skippedColumns).to.equal(expectedOutput.skippedColumns);
-        expect(output.schemaConflict).to.equal(expectedOutput.schemaConflict);
+
         output.file && expect(output.file).to.endWith(`${expectedOutput.file}.js`);
     },
 

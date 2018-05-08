@@ -4,11 +4,11 @@ const Joi = require('joi');
 const Model = require('schwifty').Model;
 const TestModels = require('./');
 
-module.exports = class BadMovieWithBadPersonRef extends Model {
+module.exports = class MovieWithBadPerson extends Model {
 
     static get tableName() {
 
-        return 'BadMovieWithBadPersonRef';
+        return 'MovieWithBadPerson';
     }
 
     static get joiSchema() {
@@ -37,7 +37,7 @@ module.exports = class BadMovieWithBadPersonRef extends Model {
                         to: 'Person_Movie.movieId',
                         modelClass: TestModels.Person_Movie
                     },
-                    to: 'BadMovieWithBadPersonRef.id'
+                    to: 'MovieWithBadPerson.id'
                 }
             }
         };
