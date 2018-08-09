@@ -4,7 +4,7 @@
   "description": "An Objection.js model diff tool for generating knex migrations",
   "main": "lib/index.js",
   "scripts": {
-    "test": "lab -a code -t 100 --timeout 3000 -L -I '__core-js_shared__,SharedArrayBuffer,Atomics,URL,URLSearchParams'",
+    "test": "lab -a code -t 100 --timeout 3000 -L -I '__core-js_shared__,SharedArrayBuffer,Atomics,URL,URLSearchParams,BigUint64Array,BigInt64Array,BigInt'",
     "test:html": "lab -a code -t 100 -r html -o test.html -L -I '__core-js_shared__,SharedArrayBuffer,Atomics'",
     "lint": "lab -dlL",
     "coveralls": "lab -r lcov | coveralls"
