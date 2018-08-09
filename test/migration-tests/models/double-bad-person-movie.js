@@ -3,7 +3,7 @@
 const Joi = require('joi');
 const Model = require('schwifty').Model;
 
-module.exports = class Person_Movie extends Model {
+module.exports = class Double_Bad_Person_Movie extends Model {
 
     static get tableName() {
 

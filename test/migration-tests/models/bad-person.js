@@ -19,7 +19,7 @@ module.exports = class BadPerson extends Model {
 
             age: Joi.number().integer(),
 
-            // These cannot be different types, they must be the same type
+            // This Joi is unsupported, these must be the same type
             address: Joi.alternatives([
                 Joi.string(),
                 Joi.object()

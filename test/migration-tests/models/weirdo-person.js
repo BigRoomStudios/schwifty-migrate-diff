@@ -3,10 +3,7 @@
 const Joi = require('joi');
 const Model = require('schwifty').Model;
 
-// This model intended for use with test 'Suppresses alter and drop actions if mode is not set to "alter"'
-// Any alters should be ignored, this migration will be run with `mode: 'create'`
-
-module.exports = class AlterPerson extends Model {
+module.exports = class WeirdoPerson extends Model {
 
     static get tableName() {
 
@@ -17,7 +14,7 @@ module.exports = class AlterPerson extends Model {
 
         return Joi.object({
             id: Joi.number().integer(),
-            firstName: Joi.number(), // It's the future, all firstNames are numbers now // This will be ignored
+            firstName: Joi.number(),
 
             age: Joi.number().integer(),
 
@@ -27,7 +24,8 @@ module.exports = class AlterPerson extends Model {
                 zipCode: Joi.string()
             }),
 
-            hometown: Joi.string() // This will be the only thing reflected in the migration file
+            hometown: Joi.string(),
+            weirdo_column: Joi.string() // This conflicts with an unsupported (skipped) weirdo_column in the db
         });
     }
 };
