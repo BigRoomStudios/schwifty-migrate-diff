@@ -1,53 +1,51 @@
 {
-    "name": "schwifty-migrate-diff",
-    "version": "0.0.3",
-    "description": "An Objection.js model migration tool for use during development",
-    "main": "lib/index.js",
-    "scripts": {
-        "test": "lab -a code -t 100 --timeout 3000 -L -I '__core-js_shared__,SharedArrayBuffer,Atomics,URL,URLSearchParams'",
-        "test:html": "lab -a code -t 100 -r html -o test.html -L -I '__core-js_shared__,SharedArrayBuffer,Atomics'",
-        "lint": "eslint .",
-        "coveralls": "lab -r lcov | coveralls"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/BigRoomStudios/schwifty-migrate-diff.git"
-    },
-    "engines": {
-        "node": ">=4.0.0"
-    },
-    "keywords": [
-        "hapi",
-        "plugin",
-        "objection",
-        "database",
-        "migration",
-        "orm",
-        "schwifty"
-    ],
-    "author": "William Woodruff <bill@bigroomstudios.com>",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/BigRoomStudios/schwifty-migrate-diff/issues"
-    },
-    "homepage": "https://github.com/BigRoomStudios/schwifty-migrate-diff#readme",
-    "dependencies": {
-        "handlebars": "4.x.x",
-        "hoek": "5.x.x",
-        "items": "2.x.x",
-        "joi": "13.x.x",
-        "jsondiffpatch": "0.2.x"
-    },
-    "devDependencies": {
-        "code": "4.x.x",
-        "coveralls": "2.x.x",
-        "eslint": "3.x.x",
-        "glue": "4.x.x",
-        "knex": "0.13.x",
-        "lab": "14.x.x",
-        "mysql": "2.13.x",
-        "objection": "1.1.x",
-        "pg": "6.x.x",
-        "schwifty": "4.x.x"
-    }
+  "name": "schwifty-migrate-diff",
+  "version": "0.0.3",
+  "description": "An Objection.js model diff tool for generating knex migrations",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "lab -a code -t 100 --timeout 3000 -L -I '__core-js_shared__,SharedArrayBuffer,Atomics,URL,URLSearchParams'",
+    "test:html": "lab -a code -t 100 -r html -o test.html -L -I '__core-js_shared__,SharedArrayBuffer,Atomics'",
+    "lint": "lab -dlL",
+    "coveralls": "lab -r lcov | coveralls"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BigRoomStudios/schwifty-migrate-diff.git"
+  },
+  "engines": {
+    "node": ">=8.x.x"
+  },
+  "keywords": [
+    "hapi",
+    "objection",
+    "database",
+    "generate",
+    "migration",
+    "knex",
+    "schwifty"
+  ],
+  "author": "William Woodruff <bill@bigroomstudios.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BigRoomStudios/schwifty-migrate-diff/issues"
+  },
+  "homepage": "https://github.com/BigRoomStudios/schwifty-migrate-diff#readme",
+  "dependencies": {
+    "handlebars": "4.x.x",
+    "hoek": "5.x.x",
+    "items": "2.x.x",
+    "joi": "13.x.x",
+    "jsondiffpatch": "0.3.x"
+  },
+  "devDependencies": {
+    "code": "5.x.x",
+    "coveralls": "3.x.x",
+    "knex": "0.14.x",
+    "lab": "14.x.x",
+    "mysql": "2.x.x",
+    "objection": "1.x.x",
+    "pg": "7.x.x",
+    "schwifty": "4.x.x"
+  }
 }

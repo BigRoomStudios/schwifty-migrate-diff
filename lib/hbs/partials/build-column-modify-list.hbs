@@ -1,10 +1,10 @@
 {{#each @root.columnDeltas.changes}}
-{{#if (itemNotInArray this.model @root.createdTables)}}
+{{#if (itemNotInArray this.tableName @root.createdTables)}}
 {{#if (someObjectPropsHaveValue this)}}
-        .alterTable('{{this.model}}', (table) => {
+        .alterTable('{{this.tableName}}', (table) => {
 
             {{#each this.create}}
-            table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this.model @root.allTables))}}('{{this}}');
+            table.{{keyFromObject this (keyFromObject 'knexSchema' (keyFromObject ../this.tableName @root.allTables))}}('{{this}}');
             {{/each}}
             {{#each (objectKeys this.alter)}}
             table.{{indexFromArray 1 (keyFromObject this ../this.alter)}}('{{this}}').alter();

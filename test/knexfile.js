@@ -15,14 +15,15 @@ module.exports = [
         connection: {
             host: '127.0.0.1',
             user: 'root',
-            database: 'schwifty_migrate_diff_test'
+            database: 'schwifty_migrate_diff_test',
+            multipleStatements: true
         },
         pool: {
             afterCreate: (conn, cb) => {
 
-                conn.query(`SET SESSION sql_mode='NO_AUTO_VALUE_ON_ZERO'`, (err) => { // eslint-disable-line
+                conn.query('SET SESSION sql_mode=\'NO_AUTO_VALUE_ON_ZERO\'', (err) => {
 
-                    cb(err, conn);
+                    return cb(err, conn);
                 });
             }
         }

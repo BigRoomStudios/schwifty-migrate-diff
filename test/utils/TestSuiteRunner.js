@@ -104,11 +104,11 @@ module.exports = class TestRunner {
                                 // Ensure the migration matches expected
                                 expect(actualMigrationContents).to.equal(expectedMigrationContents);
 
-                                expect(utils.validateOutput(output, {
+                                utils.validateOutput(output, {
                                     code: SchwiftyMigration.returnCodes.MIGRATION,
-                                    file: 'truthy',
+                                    file: `it-${itText.split(' ').join('-')}`,
                                     skippedColumns: []
-                                })).to.equal(true);
+                                });
 
                                 // Now run the just created migration to make sure the code is valid!
 
@@ -145,11 +145,11 @@ module.exports = class TestRunner {
                                                 return done(err);
                                             }
 
-                                            expect(utils.validateOutput(noMigrationNeededOutput, {
+                                            utils.validateOutput(noMigrationNeededOutput, {
                                                 code: SchwiftyMigration.returnCodes.NO_MIGRATION,
                                                 file: null,
                                                 skippedColumns: []
-                                            })).to.equal(true);
+                                            });
 
                                             // Finally, we'll test the rollback code
                                             // let's rollback this migration,
@@ -176,11 +176,11 @@ module.exports = class TestRunner {
                                                         return done(err);
                                                     }
 
-                                                    expect(utils.validateOutput(afterRollbackOutput, {
+                                                    utils.validateOutput(afterRollbackOutput, {
                                                         code: SchwiftyMigration.returnCodes.MIGRATION,
-                                                        file: 'truthy',
+                                                        file: 'after-rollback',
                                                         skippedColumns: []
-                                                    })).to.equal(true);
+                                                    });
 
                                                     expect(Fs.readFileSync(afterRollbackOutput.file).toString('utf8')).to.equal(expectedMigrationContents);
                                                     done();

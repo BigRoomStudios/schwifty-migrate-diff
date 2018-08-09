@@ -1,7 +1,7 @@
 {{#each @root.columnDeltas.changes}}
-{{#if (itemNotInArray this.model @root.createdTables)}}
+{{#if (itemNotInArray this.tableName @root.createdTables)}}
 {{#if (someObjectPropsHaveValue this)}}
-        .alterTable('{{this.model}}', (table) => {
+        .alterTable('{{this.tableName}}', (table) => {
 
             {{#each this.create}}
             table.dropColumn('{{this}}');
