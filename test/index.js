@@ -132,6 +132,29 @@ describe('SchwiftyMigration', () => {
         });
     });
 
+    it('not to fail if schema has a key with the name of the table', (done, onCleanup) => {
+
+        internals.makeSession((err, session) => {
+
+            if (err) {
+                return done(err);
+            }
+
+            internals.testUtils.setupCleanup(onCleanup, session);
+
+            SchwiftyMigration.genMigrationFile({
+                models: [TestModels.DogDog],
+                migrationsDir: './test/migration-tests/migrations',
+                knex: session.knex,
+                migrationName: 'test'
+            }, (err) => {
+
+                expect(err).to.not.exist();
+                done();
+            });
+        });
+    });
+
     it('accepts absolute and relative migration file paths', (done, onCleanup) => {
 
         internals.makeSession((err, session) => {
