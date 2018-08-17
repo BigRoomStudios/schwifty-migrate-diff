@@ -7,6 +7,7 @@ exports.MovieWithBadPerson = require('./movie-with-bad-person');
 exports.BadPerson = require('./bad-person');
 exports.BadZombie = require('./bad-zombie');
 exports.Dog = require('./dog');
+exports.DogDog = require('./dog-dog');
 exports.Double_Bad_Person_Movie = require('./double-bad-person-movie');
 exports.DoubleBadMovie = require('./double-bad-movie');
 exports.Movie = require('./movie');
