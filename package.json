@@ -1,6 +1,6 @@
 {
   "name": "schwifty-migrate-diff",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An Objection.js model diff tool for generating knex migrations",
   "main": "lib/index.js",
   "scripts": {
